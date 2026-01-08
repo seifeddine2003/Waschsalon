@@ -1,20 +1,13 @@
-# ===================
-# Frontend (React)
-# ===================
+# Ignore everything by default
+*
+
+# But do NOT ignore these files/folders
+!frontend/
+!backend/
+!.gitignore
+
+
+# Ignore unnecessary folders inside frontend/backend
 frontend/node_modules/
 frontend/build/
-
-# ===================
-# Backend (Java)
-# ===================
 backend/target/
-*.class
-*.log
-
-# ===================
-# OS / Editor files
-# ===================
-.DS_Store
-*.idea/
-*.vscode/
-*.iml
