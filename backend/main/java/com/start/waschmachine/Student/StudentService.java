@@ -13,6 +13,11 @@ public class StudentService {
     public Student registerStudent(Student s) {
         return studentRepository.save(s);
     }
+    public Student login(String email, String password) {
+        return studentRepository.findByEmail(email)
+                .filter(s -> s.getPassword().equals(password))
+                .orElse(null);
+    }
 
     public Student getStudent(int id) {
         return studentRepository.findById(id).orElse(null);

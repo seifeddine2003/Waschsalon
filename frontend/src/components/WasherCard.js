@@ -1,43 +1,62 @@
 import React from "react";
+import openWasher from "../images/washer-open.png";
+import closedWasher from "../images/washer-closed.png";
+
 
 export default function WasherCard({ washer }) {
+
+    const getWasherImage = () => {
+        switch (washer.status) {
+            case "Available":
+                return openWasher;
+            case "In Use":
+                return closedWasher;
+            default:
+                return closedWasher;
+        }
+    };
+
     return (
         <div className="card">
             <div className="card-header">
                 <span className="washer-name">{washer.name}</span>
-                <span className={`status-pill ${washer.type}`}>
-          {washer.status}
-        </span>
+                <span className={`status-pill ${washer.status.replace(" ", "-")}`}>
+                    {washer.status}
+                    </span>
             </div>
 
             <div className="card-body">
-                {washer.type === "busy" && (
+
+                {washer.status === "In Use" && (
                     <div>
                         <p>⏳ Time remaining: {washer.timeRemaining} min</p>
+                        {Array.isArray(washer.users) && washer.users.length > 0 && (
+                            <p>👤 Users: {washer.users.join(", ")}</p>
+                        )}
                     </div>
                 )}
 
-                {washer.type === "available" && (
-                    <p className="action-text">Start washing now</p>
+                {washer.status === "Available" && washer.isOpen && (
+                    <p className="action-text">✅ Start washing now</p>
                 )}
 
-                {washer.type === "broken" && (
-                    <p className="action-text gray">Washer needs inspection</p>
+                {washer.status === "Out of Order" && (
+                    <p className="action-text gray">
+                        ⚠️ Washer needs inspection
+                    </p>
                 )}
 
-                {washer.type === "setting-up" && (
-                    <p className="action-text blue">Program selection in progress</p>
-                )}
-
-                <div className="washer-circle">
-                    <div className="inner-drum"></div>
-                </div>
+                <img
+                    src={getWasherImage()}
+                    alt="Washing machine"
+                    className="washer-image"
+                />
             </div>
 
             <div className="card-footer">
                 <button
                     className="start-btn"
-                    disabled={washer.type === "broken"}
+                    disabled={washer.status !== "Available"}
                 >
                     Start
                 </button>

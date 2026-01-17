@@ -14,16 +14,15 @@ public class Student {
     private String nachname;
     private String email;
     private String password;
-    private int balance;
+    private int balance=0;
 
     public Student() {};
-    public Student(int balance, String password, String email, String nachname, String vorname, int studentId) {
-        this.balance = balance;
+    public Student(String password, String email, String nachname, String vorname) {
+        this.balance = 0;
         this.password = password;
         this.email = email;
         this.nachname = nachname;
         this.vorname = vorname;
-        this.StudentId = studentId;
     }
     public void setStudentId(int id) {
         this.StudentId = id;
