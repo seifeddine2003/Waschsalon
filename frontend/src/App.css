@@ -388,19 +388,9 @@ body {
   color: #166534;
 }
 
-.status-pill.In-Use {
-  background: #e0e7ff;
-  color: #3730a3;
-}
-
 .status-pill.Out-of-Order {
   background: #e5e7eb;
   color: #374151;
-}
-
-.status-pill.Setting-Up {
-  background: #dbeafe;
-  color: #1e40af;
 }
 
 /* ================= CARD BODY ================= */
@@ -434,10 +424,6 @@ body {
 
 .card:hover .washer-image {
   transform: scale(1.05);
-}
-
-.card .washer-image.dim {
-  opacity: 0.6;
 }
 
 /* ================= CARD FOOTER ================= */

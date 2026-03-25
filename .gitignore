@@ -3,11 +3,11 @@
 
 # But do NOT ignore these files/folders
 !frontend/
-!backend/
+!src/
 !.gitignore
 
 
 # Ignore unnecessary folders inside frontend/backend
 frontend/node_modules/
 frontend/build/
-backend/target/
+src/target/
