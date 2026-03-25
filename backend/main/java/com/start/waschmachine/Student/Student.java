@@ -8,7 +8,7 @@ public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="`studentId`" , unique = true)
-    private int StudentId;
+    private int studentId;
 
     private String vorname;
     private String nachname;
@@ -18,14 +18,13 @@ public class Student {
 
     public Student() {};
     public Student(String password, String email, String nachname, String vorname) {
-        this.balance = 0;
         this.password = password;
         this.email = email;
         this.nachname = nachname;
         this.vorname = vorname;
     }
     public void setStudentId(int id) {
-        this.StudentId = id;
+        this.studentId = id;
     }
 
     public void setVorname(String vorname) {
@@ -49,7 +48,7 @@ public class Student {
     }
 
     public int getStudentId() {
-        return StudentId;
+        return studentId;
     }
 
     public String getVorname() {

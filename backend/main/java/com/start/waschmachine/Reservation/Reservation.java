@@ -1,9 +1,7 @@
 package com.start.waschmachine.Reservation;
 
-import com.start.waschmachine.Slot.Slot;
 import com.start.waschmachine.Student.Student;
 import com.start.waschmachine.Washmachine.Washmachine;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -28,6 +26,12 @@ public class Reservation {
     @Column(nullable = false)
     private String status = "active";
 
+    @Column(nullable = false)
+    private String startTime;
+
+    @Column(nullable = false)
+    private String endTime;
+
     @ManyToOne
     @JoinColumn(name = "studentId", nullable = false)
     private Student student;
@@ -36,53 +40,28 @@ public class Reservation {
     @JoinColumn(name = "machineId", nullable = false)
     private Washmachine washmachine;
 
-    @ManyToOne
-    @JoinColumn(name = "slotId", nullable = false)
-    private Slot slot;
-
     protected Reservation() {}
 
-    public Reservation(Student student, Washmachine washmachine, Slot slot, LocalDate date) {
+    public Reservation(Student student, Washmachine washmachine, String startTime, String endTime, LocalDate date) {
         this.student = student;
         this.washmachine = washmachine;
-        this.slot = slot;
+        this.startTime = startTime;
+        this.endTime = endTime;
         this.date = date;
         this.status = "active";
     }
 
-    public Integer getReservationId() {
-        return reservationId;
-    }
+    public Integer getReservationId() { return reservationId; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public LocalDate getDate() { return date; }
+    public String getStatus() { return status; }
+    public String getStartTime() { return startTime; }
+    public String getEndTime() { return endTime; }
+    public Student getStudent() { return student; }
+    public Washmachine getWashmachine() { return washmachine; }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public Student getStudent() {
-        return student;
-    }
-
-    public Washmachine getWashmachine() {
-        return washmachine;
-    }
-
-    public Slot getSlot() {
-        return slot;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
+    public void setDate(LocalDate date) { this.date = date; }
+    public void setStatus(String status) { this.status = status; }
+    public void setStartTime(String startTime) { this.startTime = startTime; }
+    public void setEndTime(String endTime) { this.endTime = endTime; }
 }

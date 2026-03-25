@@ -43,7 +43,8 @@ body {
   cursor: pointer;
   font-weight: 600;
 }
-.login{
+
+.login {
   background: var(--primary-purple);
   color: white;
   border: none;
@@ -52,6 +53,7 @@ body {
   cursor: pointer;
   font-weight: 600;
 }
+
 .nav-links button,
 .nav-links .logout {
   background: var(--primary-purple);
@@ -61,7 +63,7 @@ body {
   border-radius: 20px;
   cursor: pointer;
   font-weight: 600;
-  margin-left: 8px; /* spacing between buttons */
+  margin-left: 8px;
   transition: background 0.2s ease, transform 0.2s ease;
 }
 
@@ -76,23 +78,8 @@ body {
   color: var(--text-dark);
   margin-right: 8px;
 }
-/* Signup/Login feedback messages */
-.modal-message {
-  margin-top: 12px;
-  font-weight: 600;
-  text-align: center;
-  font-size: 0.9rem;
-}
 
-.modal-message.success {
-  color: green;
-}
-
-.modal-message.error {
-  color: red;
-}
-/* ===== MODAL ===== */
-
+/* ================= MODAL ================= */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -107,9 +94,11 @@ body {
   background: white;
   padding: 28px;
   border-radius: 20px;
-  width: 320px;
+  width: 360px;
+  max-height: 90vh;
+  overflow-y: auto;
   text-align: center;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
 .modal h2 {
@@ -123,6 +112,7 @@ body {
   border-radius: 12px;
   border: 1px solid #e5e7eb;
   font-size: 0.9rem;
+  box-sizing: border-box;
 }
 
 .modal-btn {
@@ -137,14 +127,197 @@ body {
   margin-top: 8px;
 }
 
+.modal-btn:hover {
+  opacity: 0.92;
+}
+
 .modal-close {
   margin-top: 10px;
   background: none;
   border: none;
   color: #6b7280;
   cursor: pointer;
+  font-size: 0.9rem;
 }
 
+/* ================= MODAL MESSAGES ================= */
+.modal-message {
+  margin-top: 12px;
+  font-weight: 600;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.modal-message.success {
+  color: green;
+}
+
+.modal-message.error {
+  color: red;
+}
+
+/* ================= MODAL LABELS ================= */
+.modal-label {
+  display: block;
+  text-align: left;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-gray);
+  margin-bottom: 6px;
+  margin-top: 10px;
+}
+
+.loading-hint {
+  font-size: 0.75rem;
+  color: var(--primary-purple-light);
+  font-weight: 400;
+}
+
+/* ================= TODAY BADGE ================= */
+.today-badge {
+  background: #ede9fe;
+  color: var(--primary-purple);
+  border-radius: 12px;
+  padding: 8px 14px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+/* ================= SLOT GRID ================= */
+.slot-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.slot-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 6px;
+  border-radius: 12px;
+  border: 2px solid var(--border-light);
+  background: white;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.slot-btn:hover:not(:disabled) {
+  border-color: var(--primary-purple-light);
+  background: #f5f3ff;
+}
+
+.slot-btn.selected {
+  border-color: var(--primary-purple);
+  background: #ede9fe;
+  color: var(--primary-purple);
+}
+
+.slot-btn.booked {
+  background: #f3f4f6;
+  border-color: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.slot-btn.past {
+  background: #fafafa;
+  border-color: #e5e7eb;
+  color: #d1d5db;
+  cursor: not-allowed;
+}
+
+.slot-tag {
+  font-size: 0.65rem;
+  color: #ef4444;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.slot-btn.past .slot-tag {
+  color: #9ca3af;
+}
+
+.slot-hint {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-gray);
+  margin: 0;
+}
+
+/* ================= WASH TYPE GRID ================= */
+.wash-type-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.wash-type-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  border-radius: 14px;
+  border: 2px solid var(--border-light);
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.wash-type-btn:hover {
+  border-color: var(--primary-purple-light);
+  background: #f5f3ff;
+}
+
+.wash-type-btn.selected {
+  border-color: var(--primary-purple);
+  background: #ede9fe;
+}
+
+.wash-type-name {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text-dark);
+}
+
+.wash-type-duration {
+  font-size: 0.75rem;
+  color: var(--text-gray);
+  margin-top: 2px;
+}
+
+/* ================= TIME SUMMARY ================= */
+.time-summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  padding: 10px;
+  margin-bottom: 14px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #166534;
+}
+
+.time-arrow {
+  font-size: 1.1rem;
+}
+
+.time-label {
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: #4ade80;
+}
 
 /* ================= HERO ================= */
 .hero {
@@ -210,7 +383,6 @@ body {
   font-weight: 600;
 }
 
-/* Match React: status.replace(" ", "-") */
 .status-pill.Available {
   background: #dcfce7;
   color: #166534;
@@ -264,7 +436,6 @@ body {
   transform: scale(1.05);
 }
 
-/* Optional: subtle dim for unavailable */
 .card .washer-image.dim {
   opacity: 0.6;
 }
