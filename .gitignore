@@ -1,13 +1,5 @@
-# Ignore everything by default
-*
 
-# But do NOT ignore these files/folders
-!frontend/
-!src/
-!.gitignore
-
-
-# Ignore unnecessary folders inside frontend/backend
+# Ignore unnecessary folders inside frontend/src
 frontend/node_modules/
 frontend/build/
 src/target/

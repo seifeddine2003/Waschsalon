@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/static/css/main.eae5ae9e.css",
+    "main.js": "/static/js/main.b63b4c0d.js",
+    "static/media/washer-open.png": "/static/media/washer-open.95bdb8d30ef7807f07f1.png",
+    "static/media/washer-defect.png": "/static/media/washer-defect.24329fecc6d274e21537.png",
+    "static/media/washer-closed.png": "/static/media/washer-closed.1619a9f82cb4ece60d89.png",
+    "index.html": "/index.html",
+    "main.eae5ae9e.css.map": "/static/css/main.eae5ae9e.css.map",
+    "main.b63b4c0d.js.map": "/static/js/main.b63b4c0d.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.eae5ae9e.css",
+    "static/js/main.b63b4c0d.js"
+  ]
+}
