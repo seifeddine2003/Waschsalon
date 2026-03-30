@@ -6,10 +6,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
-@RequestMapping("/students")
 @CrossOrigin(origins = {
         "http://localhost:3000",
+        "https://waschsalon.vercel.app",
         "https://waschsalon-clzuo3q3a-seifeddine2003s-projects.vercel.app"
 })
 public class StudentController {
