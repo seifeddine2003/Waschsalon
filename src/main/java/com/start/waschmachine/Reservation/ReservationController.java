@@ -7,11 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = {
-        "http://localhost:3000",
-        "https://waschsalon.vercel.app",
-        "https://waschsalon-clzuo3q3a-seifeddine2003s-projects.vercel.app"
-})
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/reservations")
 public class ReservationController {

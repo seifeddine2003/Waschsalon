@@ -8,11 +8,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-@CrossOrigin(origins = {
-        "http://localhost:3000",
-        "https://waschsalon.vercel.app",
-        "https://waschsalon-clzuo3q3a-seifeddine2003s-projects.vercel.app"
-})
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/slots")
 public class SlotController {
