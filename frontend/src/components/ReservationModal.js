@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import API_BASE, { HEADERS } from "../config";
 
 const WASH_TYPES = [
     { label: "Quick Wash",  duration: 30 },
@@ -15,19 +16,15 @@ function addMinutes(timeStr, mins) {
     return `${hh}:${mm}`;
 }
 
-function getToday() {
-    return new Date().toISOString().split("T")[0];
-}
-
 export default function ReservationModal({ isOpen, onClose, washer, user }) {
-    const [slots, setSlots]               = useState([]);
+    const [slots, setSlots] = useState([]);
     const [selectedSlot, setSelectedSlot] = useState(null);
-    const [washType, setWashType]         = useState(null);
-    const [message, setMessage]           = useState("");
-    const [isError, setIsError]           = useState(false);
+    const [washType, setWashType] = useState(null);
+    const [message, setMessage] = useState("");
+    const [isError, setIsError] = useState(false);
     const [loadingSlots, setLoadingSlots] = useState(false);
 
-    const today = getToday();
+    const today = new Date().toISOString().split("T")[0];
 
     useEffect(() => {
         if (!isOpen || !washer?.id) return;
@@ -37,18 +34,13 @@ export default function ReservationModal({ isOpen, onClose, washer, user }) {
         setMessage("");
         setLoadingSlots(true);
 
-        // Fetch available slots for this machine (already filters out past + booked)
-        fetch(`http://localhost:8080/slots/available?machineId=${washer.id}`)
+        fetch(`${API_BASE}/slots/available?machineId=${washer.id}`, {
+            headers: HEADERS,
+        })
             .then(res => res.json())
-            .then(data => {
-                setSlots(Array.isArray(data) ? data : []);
-                setLoadingSlots(false);
-            })
-            .catch(err => {
-                console.error("Slot fetch error:", err);
-                setSlots([]);
-                setLoadingSlots(false);
-            });
+            .then(data => setSlots(Array.isArray(data) ? data : []))
+            .catch(() => setSlots([]))
+            .finally(() => setLoadingSlots(false));
     }, [isOpen, washer?.id]);
 
     if (!isOpen) return null;
@@ -59,53 +51,54 @@ export default function ReservationModal({ isOpen, onClose, washer, user }) {
 
     const handleBook = () => {
         if (!selectedSlot || !washType) {
-            setMessage("❌ Please select a time slot and wash type.");
+            setMessage("Please select a time slot and wash type.");
             setIsError(true);
             return;
         }
 
         const payload = {
-            studentId: user.studentId,
-            machineId: washer.id,
-            startTime: selectedSlot.startTime,   // ← changed from slotId
-            endTime:   selectedSlot.endTime,     // ← changed from slotId
-            date:      today,
-            washType:  washType.label,
+            studentId:    user.studentId,
+            machineId:    washer.id,
+            startTime:    selectedSlot.startTime,
+            endTime:      addMinutes(selectedSlot.startTime, washType.duration),
+            date:         today,
+            washType:     washType.label,
             washDuration: washType.duration,
         };
 
-        fetch(`http://localhost:8080/reservations/create`, {
+        fetch(`${API_BASE}/reservations/create`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: HEADERS,
             body: JSON.stringify(payload),
         })
             .then(res => {
-                if (!res.ok) return res.text().then(t => { throw new Error(t) });
+                if (!res.ok) return res.text().then(t => { throw new Error(t); });
                 return res.json();
             })
             .then(() => {
-                setMessage("✅ Reservation successful!");
+                setMessage("✅ Reservation confirmed!");
                 setIsError(false);
-                // Remove the booked slot from the list immediately
                 setSlots(prev => prev.filter(s => s.startTime !== selectedSlot.startTime));
                 setSelectedSlot(null);
             })
             .catch(err => {
-                setMessage("❌ " + err.message);
+                setMessage(err.message || "Something went wrong.");
                 setIsError(true);
             });
     };
+
+    const formattedDate = new Date().toLocaleDateString("en-GB", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+    });
 
     return (
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={e => e.stopPropagation()}>
                 <h2>Reserve {washer.name}</h2>
 
-                <div className="today-badge">
-                    📅 Today — {new Date().toLocaleDateString("en-GB", {
-                    weekday: "long", day: "numeric", month: "long"
-                })}
-                </div>
+                <div className="today-badge">📅 Today — {formattedDate}</div>
 
                 <label className="modal-label">
                     🕐 Pick a time slot
@@ -113,26 +106,21 @@ export default function ReservationModal({ isOpen, onClose, washer, user }) {
                 </label>
 
                 <div className="slot-grid">
-                    {slots.length === 0 && !loadingSlots && (
-                        <p style={{ color: "#6b7280", fontSize: "0.85rem" }}>
-                            No available slots for today.
-                        </p>
+                    {!loadingSlots && slots.length === 0 && (
+                        <p className="no-slots">No available slots for today.</p>
                     )}
-                    {slots.map((slot, index) => {
-                        const isSelected = selectedSlot?.startTime === slot.startTime;
-                        return (
-                            <button
-                                key={index}
-                                className={`slot-btn ${isSelected ? "selected" : ""}`}
-                                onClick={() => setSelectedSlot(slot)}
-                            >
-                                {slot.startTime}
-                            </button>
-                        );
-                    })}
+                    {slots.map((slot, i) => (
+                        <button
+                            key={i}
+                            className={`slot-btn ${selectedSlot?.startTime === slot.startTime ? "selected" : ""}`}
+                            onClick={() => setSelectedSlot(slot)}
+                        >
+                            {slot.startTime}
+                        </button>
+                    ))}
                 </div>
 
-                <label className="modal-label">🧺 Wash Type</label>
+                <label className="modal-label">🧺 Wash type</label>
                 <div className="wash-type-grid">
                     {WASH_TYPES.map(type => (
                         <button
@@ -148,7 +136,7 @@ export default function ReservationModal({ isOpen, onClose, washer, user }) {
 
                 {endTime && (
                     <div className="time-summary">
-                        <span>⏱ {selectedSlot.startTime}</span>
+                        <span>{selectedSlot.startTime}</span>
                         <span className="time-arrow">→</span>
                         <span>{endTime}</span>
                         <span className="time-label">({washType.duration} min)</span>

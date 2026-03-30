@@ -2,4 +2,4 @@
 # Ignore unnecessary folders inside frontend/src
 frontend/node_modules/
 frontend/build/
-src/target/
+backend/target/

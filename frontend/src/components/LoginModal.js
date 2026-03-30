@@ -1,35 +1,21 @@
 import React, { useState } from "react";
-import API_BASE, { HEADERS } from "../config";
+import { login } from "../api/studentApi";
 
 export default function LoginModal({ isOpen, onClose, onLogin }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
 
     if (!isOpen) return null;
 
     const handleLogin = () => {
-        fetch(`${API_BASE}/students/login`, {
-            method: "POST",
-            headers: HEADERS,
-            body: JSON.stringify({ email, password })
-        })
-            .then(res => {
-                if (!res.ok) {
-                    alert("Invalid email or password");
-                    throw new Error("Invalid credentials");
-                }
-                return res.json();
-            })
+        setError("");
+        login(email, password)
             .then(user => {
-                if (!user) {
-                    alert("Invalid email or password");
-                    return;
-                }
-                console.log("Logged in:", user);
                 onLogin(user);
                 onClose();
             })
-            .catch(err => console.error("Login error:", err));
+            .catch(() => setError("Invalid email or password."));
     };
 
     return (
@@ -53,6 +39,9 @@ export default function LoginModal({ isOpen, onClose, onLogin }) {
                 />
 
                 <button className="modal-btn" onClick={handleLogin}>Login</button>
+
+                {error && <p className="modal-message error">{error}</p>}
+
                 <button className="modal-close" onClick={onClose}>Cancel</button>
             </div>
         </div>

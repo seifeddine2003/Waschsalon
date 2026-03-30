@@ -4,20 +4,6 @@ A full-stack web application that allows students living in a dormitory to view 
 
 ---
 
-## 📋 Table of Contents
-
-- [Overview](#overview)
-- [Tech Stack](#tech-stack)
-- [Architecture](#architecture)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [API Reference](#api-reference)
-- [Database Schema](#database-schema)
-- [Testing](#testing)
-- [Known Limitations](#known-limitations)
-
----
-
 ## Overview
 
 LaundryWeb is a reservation platform for student dormitories. Students can:
@@ -175,8 +161,8 @@ Content-Type: application/json
 {
   "vorname": "John",
   "nachname": "Doe",
-  "email": "john@dorm.com",
-  "password": "secret123"
+  "email": "**********",
+  "password": "*******"
 }
 ```
 **Response:** `200 OK` — returns the created Student object

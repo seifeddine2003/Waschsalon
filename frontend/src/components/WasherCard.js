@@ -4,21 +4,20 @@ import closedWasher from "../images/washer-closed.png";
 import defectWasher from "../images/washer-defect.png";
 
 export default function WasherCard({ washer, user, onReserve }) {
-
-    const getWasherImage = () => {
-        switch (washer.status) {
-            case "Available":   return openWasher;
-            case "Out of Order": return defectWasher;
-            default:            return closedWasher;
-        }
+    const getImage = () => {
+        if (washer.status === "Available") return openWasher;
+        if (washer.status === "Out of Order") return defectWasher;
+        return closedWasher;
     };
+
+    const isAvailable = washer.status === "Available";
 
     return (
         <div className="card">
             <div className="card-header">
                 <span className="washer-name">{washer.name}</span>
-                <span className={`status-pill ${washer.status.replace(" ", "-")}`}>
-                    {washer.status}
+                <span className={`status-pill ${(washer.status || "").replace(" ", "-")}`}>
+                    {washer.status || "Unknown"}
                 </span>
             </div>
 
@@ -26,25 +25,20 @@ export default function WasherCard({ washer, user, onReserve }) {
                 {washer.status === "Out of Order" && (
                     <p className="action-text gray">⚠️ Washer needs inspection</p>
                 )}
-
-                {washer.status === "Available" && (
+                {isAvailable && (
                     <p className="action-text">✅ Select a time slot to reserve</p>
                 )}
 
-                <img
-                    src={getWasherImage()}
-                    alt="Washing machine"
-                    className="washer-image"
-                />
+                <img src={getImage()} alt="Washing machine" className="washer-image" />
             </div>
 
             <div className="card-footer">
                 <button
                     className="start-btn"
-                    disabled={washer.status !== "Available" || !user}
+                    disabled={!isAvailable || !user}
                     onClick={() => onReserve(washer)}
                 >
-                    {!user ? "Login to Reserve" : "Reserve"}
+                    {user ? "Reserve" : "Login to Reserve"}
                 </button>
             </div>
         </div>

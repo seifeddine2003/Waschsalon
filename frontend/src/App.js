@@ -1,33 +1,23 @@
 import React, { useEffect, useState } from "react";
-import WasherCard from "./components/WasherCard";
 import "./App.css";
+import API_BASE, { HEADERS } from "./config";
+import WasherCard from "./components/WasherCard";
 import LoginModal from "./components/LoginModal";
 import SignupModal from "./components/SignupModal";
+import ReservationModal from "./components/ReservationModal";
 
 function App() {
     const [washers, setWashers] = useState([]);
+    const [user, setUser] = useState(null);
+    const [reservingWasher, setReservingWasher] = useState(null);
     const [loginOpen, setLoginOpen] = useState(false);
     const [signupOpen, setSignupOpen] = useState(false);
-    // ← load user from localStorage on startup
-    const [user, setUser] = useState(() => {
-        const saved = localStorage.getItem("user");
-        return saved ? JSON.parse(saved) : null;
-    });
-
-    // Save user to localStorage whenever it changes
-    useEffect(() => {
-        if (user) {
-            localStorage.setItem("user", JSON.stringify(user));
-        } else {
-            localStorage.removeItem("user");
-        }
-    }, [user]);
 
     useEffect(() => {
-        fetch("http://localhost:8080/washmachines/all")
-            .then((res) => res.json())
-            .then((data) => setWashers(data))
-            .catch((err) => console.error("Backend error:", err));
+        fetch(`${API_BASE}/washmachines/all`, { headers: HEADERS })
+            .then(res => res.json())
+            .then(data => setWashers(data))
+            .catch(err => console.error("Could not load machines:", err));
     }, []);
 
     return (
@@ -60,10 +50,15 @@ function App() {
                 onClose={() => setLoginOpen(false)}
                 onLogin={setUser}
             />
-
             <SignupModal
                 isOpen={signupOpen}
                 onClose={() => setSignupOpen(false)}
+            />
+            <ReservationModal
+                isOpen={!!reservingWasher}
+                washer={reservingWasher}
+                user={user}
+                onClose={() => setReservingWasher(null)}
             />
 
             <header className="hero">
@@ -75,8 +70,13 @@ function App() {
             </header>
 
             <div className="grid">
-                {washers.map((washer) => (
-                    <WasherCard key={washer.id} washer={washer} user={user} />
+                {washers.map(washer => (
+                    <WasherCard
+                        key={washer.id}
+                        washer={washer}
+                        user={user}
+                        onReserve={setReservingWasher}
+                    />
                 ))}
             </div>
         </div>
