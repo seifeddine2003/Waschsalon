@@ -8,7 +8,10 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {
+        "http://localhost:3000",
+        "https://YOUR-REAL-VERCEL-URL.vercel.app"
+})
 @RestController
 @RequestMapping("/slots")
 public class SlotController {

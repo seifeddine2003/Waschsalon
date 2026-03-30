@@ -8,6 +8,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/students")
+@CrossOrigin(origins = {
+        "http://localhost:3000",
+        "https://YOUR-REAL-VERCEL-URL.vercel.app"
+})
 public class StudentController {
 
     @Autowired

@@ -14,6 +14,10 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/washmachines")
+@CrossOrigin(origins = {
+        "http://localhost:3000",
+        "https://YOUR-REAL-VERCEL-URL.vercel.app"
+})
 public class WashmachineController {
 
     @Autowired
