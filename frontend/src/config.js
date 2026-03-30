@@ -1,5 +1,5 @@
 const API_BASE = process.env.NODE_ENV === "production"
-    ? "https://YOUR-REAL-RENDER-URL.onrender.com"
+    ? "https://waschsalon.onrender.com"  // ← replace with your exact Render URL
     : "http://localhost:8080";
 
 export const HEADERS = {

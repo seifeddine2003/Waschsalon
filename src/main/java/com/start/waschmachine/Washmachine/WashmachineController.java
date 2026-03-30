@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/washmachines")
 @CrossOrigin(origins = {
         "http://localhost:3000",
-        "https://YOUR-REAL-VERCEL-URL.vercel.app"
+        "https://waschsalon-clzuo3q3a-seifeddine2003s-projects.vercel.app"
 })
 public class WashmachineController {
 
