@@ -26,7 +26,7 @@ export default function WasherCard({ washer, user, onReserve }) {
                     <p className="action-text gray">⚠️ Washer needs inspection</p>
                 )}
                 {isAvailable && (
-                    <p className="action-text">✅ Select a time slot to reserve</p>
+                    <p className="action-text"> Select a time slot to reserve</p>
                 )}
 
                 <img src={getImage()} alt="Washing machine" className="washer-image" />

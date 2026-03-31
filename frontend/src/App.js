@@ -23,7 +23,7 @@ function App() {
     return (
         <div className="dashboard-container">
             <nav className="navbar">
-                <div className="logo">🧺 laundryweb</div>
+                <div className="logo">🧺 Laundryweb</div>
                 <div className="nav-links">
                     {user ? (
                         <>
