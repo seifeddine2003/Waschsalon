@@ -26,4 +26,13 @@ public class StudentService {
     public List<Student> getAllStudents() {
         return studentRepository.findAll();
     }
+
+    public Student loadBalance(int id, double amountEuros) {
+        if (amountEuros < 5) {
+            throw new IllegalArgumentException("Minimum load amount is €5");
+        }
+        Student student = studentRepository.findById(id).orElseThrow();
+        student.setBalance(student.getBalance() + amountEuros);
+        return studentRepository.save(student);
+    }
 }

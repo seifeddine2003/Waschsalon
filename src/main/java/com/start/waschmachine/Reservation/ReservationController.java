@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -18,8 +19,8 @@ public class ReservationController {
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody ReservationRequest request) {
         try {
-            Reservation reservation = service.createReservation(request);
-            return ResponseEntity.ok(reservation);
+            Map<String, Object> result = service.createReservation(request);
+            return ResponseEntity.ok(result);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }

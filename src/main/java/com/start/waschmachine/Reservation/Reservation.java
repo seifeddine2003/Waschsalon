@@ -35,8 +35,11 @@ public class Reservation {
     @Column
     private String washType;
 
-    @Column(nullable = false)
+    @Column
     private Integer washDuration;
+
+    @Column
+    private Double price;
 
     @ManyToOne
     @JoinColumn(name = "studentId", nullable = false)
@@ -48,7 +51,8 @@ public class Reservation {
 
     protected Reservation() {}
 
-    public Reservation(Student student, Washmachine washmachine, String startTime, String endTime, LocalDate date) {
+    public Reservation(Student student, Washmachine washmachine,
+                       String startTime, String endTime, LocalDate date) {
         this.student = student;
         this.washmachine = washmachine;
         this.startTime = startTime;
@@ -57,21 +61,23 @@ public class Reservation {
         this.status = "active";
     }
 
-    public Integer getReservationId() { return reservationId; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public LocalDate getDate() { return date; }
-    public String getStatus() { return status; }
-    public String getStartTime() { return startTime; }
-    public String getEndTime() { return endTime; }
-    public String getWashType() { return washType; }
-    public Integer getWashDuration() { return washDuration; }
-    public Student getStudent() { return student; }
-    public Washmachine getWashmachine() { return washmachine; }
+    public Integer getReservationId()       { return reservationId; }
+    public LocalDateTime getCreatedAt()     { return createdAt; }
+    public LocalDate getDate()              { return date; }
+    public String getStatus()               { return status; }
+    public String getStartTime()            { return startTime; }
+    public String getEndTime()              { return endTime; }
+    public String getWashType()             { return washType; }
+    public Integer getWashDuration()        { return washDuration; }
+    public Double getPrice()                { return price; }
+    public Student getStudent()             { return student; }
+    public Washmachine getWashmachine()     { return washmachine; }
 
-    public void setDate(LocalDate date) { this.date = date; }
-    public void setStatus(String status) { this.status = status; }
-    public void setStartTime(String startTime) { this.startTime = startTime; }
-    public void setEndTime(String endTime) { this.endTime = endTime; }
-    public void setWashType(String washType) { this.washType = washType; }
-    public void setWashDuration(Integer washDuration) { this.washDuration = washDuration; }
+    public void setDate(LocalDate date)         { this.date = date; }
+    public void setStatus(String status)        { this.status = status; }
+    public void setStartTime(String s)          { this.startTime = s; }
+    public void setEndTime(String s)            { this.endTime = s; }
+    public void setWashType(String s)           { this.washType = s; }
+    public void setWashDuration(Integer d)      { this.washDuration = d; }
+    public void setPrice(Double p)              { this.price = p; }
 }

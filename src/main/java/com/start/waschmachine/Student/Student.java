@@ -14,7 +14,7 @@ public class Student {
     private String nachname;
     private String email;
     private String password;
-    private int balance=0;
+    private double balance = 0.0;
 
     public Student() {};
     public Student(String password, String email, String nachname, String vorname) {
@@ -43,7 +43,7 @@ public class Student {
         this.password = password;
     }
 
-    public void setBalance(int balance) {
+    public void setBalance(double balance) {
         this.balance = balance;
     }
 
@@ -67,7 +67,7 @@ public class Student {
         return password;
     }
 
-    public int getBalance() {
+    public double getBalance() {
         return balance;
     }
 }

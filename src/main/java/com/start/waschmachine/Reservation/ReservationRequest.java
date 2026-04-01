@@ -11,6 +11,7 @@ public class ReservationRequest {
     private LocalDate date;
     private String washType;
     private Integer washDuration;
+    private Double price;
 
     public Integer getStudentId() { return studentId; }
     public void setStudentId(Integer studentId) { this.studentId = studentId; }
@@ -32,4 +33,7 @@ public class ReservationRequest {
 
     public Integer getWashDuration() { return washDuration; }
     public void setWashDuration(Integer washDuration) { this.washDuration = washDuration; }
+
+    public Double getPrice() { return price; }
+    public void setPrice(Double price) { this.price = price; }
 }

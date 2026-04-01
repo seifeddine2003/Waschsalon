@@ -12,18 +12,24 @@ export default function WasherCard({ washer, user, onReserve }) {
 
     const isAvailable = washer.status === "Available";
 
+    const cardClass = washer.status === "Available"
+        ? "card card--available"
+        : washer.status === "Out of Order"
+        ? "card card--out-of-order"
+        : "card";
+
     return (
-        <div className="card">
+        <div className={cardClass}>
             <div className="card-header">
                 <span className="washer-name">{washer.name}</span>
-                <span className={`status-pill ${(washer.status || "").replace(" ", "-")}`}>
+                <span className={`status-pill ${(washer.status || "").replaceAll(" ", "-")}`}>
                     {washer.status || "Unknown"}
                 </span>
             </div>
 
             <div className="card-body">
                 {washer.status === "Out of Order" && (
-                    <p className="action-text gray">⚠️ Washer needs inspection</p>
+                    <p className="action-text">⚠️ Washer needs inspection</p>
                 )}
                 {isAvailable && (
                     <p className="action-text"> Select a time slot to reserve</p>
@@ -38,7 +44,7 @@ export default function WasherCard({ washer, user, onReserve }) {
                     disabled={!isAvailable || !user}
                     onClick={() => onReserve(washer)}
                 >
-                    {user ? "Reserve" : "Login to Reserve"}
+                    {washer.status === "Out of Order" ? "Under Maintenance" : user ? "Reserve" : "Login to Reserve"}
                 </button>
             </div>
         </div>

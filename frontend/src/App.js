@@ -5,6 +5,7 @@ import WasherCard from "./components/WasherCard";
 import LoginModal from "./components/LoginModal";
 import SignupModal from "./components/SignupModal";
 import ReservationModal from "./components/ReservationModal";
+import BalanceModal from "./components/BalanceModal";
 
 function App() {
     const [washers, setWashers] = useState([]);
@@ -12,6 +13,7 @@ function App() {
     const [reservingWasher, setReservingWasher] = useState(null);
     const [loginOpen, setLoginOpen] = useState(false);
     const [signupOpen, setSignupOpen] = useState(false);
+    const [balanceOpen, setBalanceOpen] = useState(false);
 
     useEffect(() => {
         fetch(`${API_BASE}/washmachines/all`, { headers: HEADERS })
@@ -20,14 +22,23 @@ function App() {
             .catch(err => console.error("Could not load machines:", err));
     }, []);
 
+    const handleBalanceUpdate = (newBalance) => {
+        setUser(prev => ({ ...prev, balance: newBalance }));
+    };
+
     return (
         <div className="dashboard-container">
             <nav className="navbar">
-                <div className="logo">🧺 Laundryweb</div>
+                <div className="logo">🧺 laundryweb</div>
                 <div className="nav-links">
                     {user ? (
                         <>
-                            <span className="welcome">Welcome, {user.vorname}</span>
+                            <span className="welcome">
+                                Welcome, {user.vorname} ·{" "}
+                                <button className="balance-btn" onClick={() => setBalanceOpen(true)}>
+                                    💳 €{user.balance.toFixed(2)}
+                                </button>
+                            </span>
                             <button className="logout" onClick={() => setUser(null)}>
                                 Logout
                             </button>
@@ -45,6 +56,12 @@ function App() {
                 </div>
             </nav>
 
+            <BalanceModal
+                isOpen={balanceOpen}
+                user={user}
+                onClose={() => setBalanceOpen(false)}
+                onBalanceUpdate={handleBalanceUpdate}
+            />
             <LoginModal
                 isOpen={loginOpen}
                 onClose={() => setLoginOpen(false)}
@@ -59,6 +76,7 @@ function App() {
                 washer={reservingWasher}
                 user={user}
                 onClose={() => setReservingWasher(null)}
+                onBalanceUpdate={handleBalanceUpdate}
             />
 
             <header className="hero">

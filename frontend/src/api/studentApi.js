@@ -13,3 +13,10 @@ export const register = (data) =>
         headers: HEADERS,
         body: JSON.stringify(data)
     }).then(res => { if (!res.ok) throw new Error(); return res.json(); });
+
+export const loadBalance = (studentId, amountEuros) =>
+    fetch(`${API_BASE}/students/${studentId}/balance/load`, {
+        method: "POST",
+        headers: HEADERS,
+        body: JSON.stringify({ amount: amountEuros })
+    }).then(res => { if (!res.ok) return res.json().then(e => { throw new Error(e.error); }); return res.json(); });

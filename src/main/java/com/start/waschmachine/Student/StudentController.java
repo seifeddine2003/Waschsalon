@@ -4,6 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 import java.util.List;
 
 @CrossOrigin(origins = "*")
@@ -35,6 +37,23 @@ public class StudentController {
     @GetMapping("/all")
     public List<Student> getAllStudents() {
         return studentService.getAllStudents();
+    }
+
+    @GetMapping("/{id}/balance")
+    public ResponseEntity<Map<String, Object>> getBalance(@PathVariable int id) {
+        Student student = studentService.getStudent(id);
+        if (student == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(Map.of("balance", student.getBalance()));
+    }
+
+    @PostMapping("/{id}/balance/load")
+    public ResponseEntity<?> loadBalance(@PathVariable int id, @RequestBody LoadBalanceRequest request) {
+        try {
+            Student student = studentService.loadBalance(id, request.getAmount());
+            return ResponseEntity.ok(student);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 }
 
