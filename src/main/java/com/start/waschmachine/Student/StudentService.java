@@ -2,7 +2,6 @@ package com.start.waschmachine.Student;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.List;
 
 @Service
 public class StudentService {
@@ -13,6 +12,7 @@ public class StudentService {
     public Student registerStudent(Student s) {
         return studentRepository.save(s);
     }
+
     public Student login(String email, String password) {
         return studentRepository.findByEmail(email)
                 .filter(s -> s.getPassword().equals(password))
@@ -21,10 +21,6 @@ public class StudentService {
 
     public Student getStudent(int id) {
         return studentRepository.findById(id).orElse(null);
-    }
-
-    public List<Student> getAllStudents() {
-        return studentRepository.findAll();
     }
 
     public Student loadBalance(int id, double amountEuros) {

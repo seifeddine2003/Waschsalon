@@ -836,3 +836,15 @@ body {
   background: #ede9fe;
   color: var(--primary-purple);
 }
+
+.card-element-wrap {
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  transition: border-color 0.2s;
+}
+
+.card-element-wrap:focus-within {
+  border-color: var(--primary-purple);
+}
