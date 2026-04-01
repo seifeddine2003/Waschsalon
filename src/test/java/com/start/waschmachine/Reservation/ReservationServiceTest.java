@@ -47,7 +47,7 @@ class ReservationServiceTest {
         when(reservationRepo.save(any())).thenAnswer(i -> i.getArgument(0));
         when(studentRepo.save(any())).thenAnswer(i -> i.getArgument(0));
 
-        Map<String, Object> result = reservationService.createReservatit adon(req);
+        Map<String, Object> result = reservationService.createReservation(req);
 
         assertNotNull(result);
         assertEquals("10:00", result.get("startTime"));
@@ -74,7 +74,7 @@ class ReservationServiceTest {
         when(reservationRepo.isSlotTaken(1, "10:00", LocalDate.now())).thenReturn(true);
 
         RuntimeException ex = assertThrows(RuntimeException.class,
-                () -> reservationService.createReservation(req));
+                                           () -> reservationService.createReservation(req));
 
         assertEquals("This slot is already reserved for this machine", ex.getMessage());
         verify(reservationRepo, never()).save(any());
@@ -90,7 +90,7 @@ class ReservationServiceTest {
         when(studentRepo.findById(99)).thenReturn(Optional.empty());
 
         RuntimeException ex = assertThrows(RuntimeException.class,
-                () -> reservationService.createReservation(req));
+                                           () -> reservationService.createReservation(req));
 
         assertEquals("Student not found", ex.getMessage());
     }
@@ -108,7 +108,7 @@ class ReservationServiceTest {
         when(machineRepo.findById(99)).thenReturn(Optional.empty());
 
         RuntimeException ex = assertThrows(RuntimeException.class,
-                () -> reservationService.createReservation(req));
+                                           () -> reservationService.createReservation(req));
 
         assertEquals("Machine not found", ex.getMessage());
         verify(reservationRepo, never()).save(any());
