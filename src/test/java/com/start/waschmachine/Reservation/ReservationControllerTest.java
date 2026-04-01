@@ -11,7 +11,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -31,15 +33,13 @@ class ReservationControllerTest {
 
     @Test
     void createReservation_success_returns200() throws Exception {
-        Student student = new Student("password123", "john@email.com", "Doe", "John");
-        Washmachine machine = new Washmachine("M1", "Available", null, null, true);
+        Map<String, Object> mockResult = new HashMap<>();
+        mockResult.put("startTime", "10:00");
+        mockResult.put("endTime", "10:30");
+        mockResult.put("washType", "Quick Wash");
+        mockResult.put("newBalance", 0.0);
 
-        Reservation reservation = new Reservation(
-                student, machine, "10:00", "10:30", LocalDate.now());
-        reservation.setWashType("Quick Wash");
-        reservation.setWashDuration(30);
-
-        when(reservationService.createReservation(any())).thenReturn(reservation);
+        when(reservationService.createReservation(any())).thenReturn(mockResult);
 
         ReservationRequest req = new ReservationRequest();
         req.setStudentId(1);
@@ -51,8 +51,8 @@ class ReservationControllerTest {
         req.setWashDuration(30);
 
         mockMvc.perform(post("/reservations/create")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(req)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.startTime").value("10:00"))
                 .andExpect(jsonPath("$.washType").value("Quick Wash"));
@@ -73,9 +73,9 @@ class ReservationControllerTest {
         req.setWashDuration(30);
 
         mockMvc.perform(post("/reservations/create")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isConflict()) // 409
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isConflict())
                 .andExpect(content().string("This slot is already reserved for this machine"));
     }
 

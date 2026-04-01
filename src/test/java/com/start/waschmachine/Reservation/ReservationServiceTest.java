@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,14 +20,9 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class ReservationServiceTest {
 
-    @Mock
-    private ReservationRepository reservationRepo;
-
-    @Mock
-    private StudentRepository studentRepo;
-
-    @Mock
-    private WashmachineRepository machineRepo;
+    @Mock private ReservationRepository reservationRepo;
+    @Mock private StudentRepository studentRepo;
+    @Mock private WashmachineRepository machineRepo;
 
     @InjectMocks
     private ReservationService reservationService;
@@ -49,15 +45,14 @@ class ReservationServiceTest {
         when(machineRepo.findById(1)).thenReturn(Optional.of(machine));
         when(reservationRepo.isSlotTaken(1, "10:00", LocalDate.now())).thenReturn(false);
         when(reservationRepo.save(any())).thenAnswer(i -> i.getArgument(0));
+        when(studentRepo.save(any())).thenAnswer(i -> i.getArgument(0));
 
-        Reservation result = reservationService.createReservation(req);
+        Map<String, Object> result = reservationService.createReservatit adon(req);
 
         assertNotNull(result);
-        assertEquals("10:00", result.getStartTime());
-        assertEquals("10:30", result.getEndTime());
-        assertEquals("Quick Wash", result.getWashType());
-        assertEquals(30, result.getWashDuration());
-        assertEquals("active", result.getStatus());
+        assertEquals("10:00", result.get("startTime"));
+        assertEquals("10:30", result.get("endTime"));
+        assertEquals("Quick Wash", result.get("washType"));
     }
 
     @Test
@@ -79,7 +74,7 @@ class ReservationServiceTest {
         when(reservationRepo.isSlotTaken(1, "10:00", LocalDate.now())).thenReturn(true);
 
         RuntimeException ex = assertThrows(RuntimeException.class,
-                                           () -> reservationService.createReservation(req));
+                () -> reservationService.createReservation(req));
 
         assertEquals("This slot is already reserved for this machine", ex.getMessage());
         verify(reservationRepo, never()).save(any());
@@ -95,7 +90,7 @@ class ReservationServiceTest {
         when(studentRepo.findById(99)).thenReturn(Optional.empty());
 
         RuntimeException ex = assertThrows(RuntimeException.class,
-                                           () -> reservationService.createReservation(req));
+                () -> reservationService.createReservation(req));
 
         assertEquals("Student not found", ex.getMessage());
     }
@@ -113,10 +108,9 @@ class ReservationServiceTest {
         when(machineRepo.findById(99)).thenReturn(Optional.empty());
 
         RuntimeException ex = assertThrows(RuntimeException.class,
-                                           () -> reservationService.createReservation(req));
+                () -> reservationService.createReservation(req));
 
         assertEquals("Machine not found", ex.getMessage());
         verify(reservationRepo, never()).save(any());
     }
-
 }

@@ -80,7 +80,7 @@ public class ReservationFlowIntegrationTest {
                                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.startTime").value("10:00"))
-                .andExpect(jsonPath("$.status").value("active"));
+                .andExpect(jsonPath("$.washType").value("cotton"));
     }
 
     @Test
