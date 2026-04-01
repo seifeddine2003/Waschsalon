@@ -335,6 +335,37 @@ body {
   color: #4ade80;
 }
 
+/* ================= MACHINE TOGGLE ================= */
+.machine-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.toggle-btn {
+  padding: 10px 32px;
+  border-radius: 999px;
+  border: 2px solid var(--border-light);
+  background: white;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text-gray);
+  transition: all 0.2s ease;
+}
+
+.toggle-btn:hover {
+  border-color: var(--primary-purple-light);
+  color: var(--primary-purple);
+}
+
+.toggle-btn.active {
+  background: linear-gradient(to right, #a78bfa, #8b5cf6);
+  border-color: transparent;
+  color: white;
+}
+
 /* ================= HERO ================= */
 .hero {
   text-align: center;

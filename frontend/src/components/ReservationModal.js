@@ -8,6 +8,12 @@ const WASH_TYPES = [
     { label: "Delicate",    duration: 45, price: 3.50 },
 ];
 
+const DRYER_TYPES = [
+    { label: "Quick Dry",  duration: 30, price: 2.00 },
+    { label: "Normal Dry", duration: 60, price: 3.50 },
+    { label: "Heavy Dry",  duration: 90, price: 5.00 },
+];
+
 function addMinutes(timeStr, mins) {
     const [h, m] = timeStr.split(":").map(Number);
     const total = h * 60 + m + mins;
@@ -17,6 +23,8 @@ function addMinutes(timeStr, mins) {
 }
 
 export default function ReservationModal({ isOpen, onClose, washer, user, onBalanceUpdate }) {
+    const isDryer = washer?.type === "dryer";
+    const machineTypes = isDryer ? DRYER_TYPES : WASH_TYPES;
     const [slots, setSlots] = useState([]);
     const [selectedSlot, setSelectedSlot] = useState(null);
     const [washType, setWashType] = useState(null);
@@ -130,9 +138,9 @@ export default function ReservationModal({ isOpen, onClose, washer, user, onBala
                         ))}
                     </div>
 
-                    <label className="modal-label">🧺 Wash type</label>
+                    <label className="modal-label">{isDryer ? "💨 Dry type" : "🧺 Wash type"}</label>
                     <div className="wash-type-grid">
-                        {WASH_TYPES.map(type => (
+                        {machineTypes.map(type => (
                             <button
                                 key={type.label}
                                 className={`wash-type-btn ${washType?.label === type.label ? "selected" : ""}`}

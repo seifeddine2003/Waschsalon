@@ -28,6 +28,7 @@ public class WashmachineController {
                     map.put("timeRemaining", w.getTimeRemaining());
                     map.put("users", w.getUsers() != null ? w.getUsers().split(",") : null);
                     map.put("isOpen", w.getIsOpen());
+                    map.put("type", w.getType() != null ? w.getType() : "washer");
                     return map;
                 })
                 .collect(Collectors.toList());

@@ -4,6 +4,8 @@ import closedWasher from "../images/washer-closed.png";
 import defectWasher from "../images/washer-defect.png";
 
 export default function WasherCard({ washer, user, onReserve }) {
+    const isDryer = washer.type === "dryer";
+
     const getImage = () => {
         if (washer.status === "Available") return openWasher;
         if (washer.status === "Out of Order") return defectWasher;
@@ -44,7 +46,11 @@ export default function WasherCard({ washer, user, onReserve }) {
                     disabled={!isAvailable || !user}
                     onClick={() => onReserve(washer)}
                 >
-                    {washer.status === "Out of Order" ? "Under Maintenance" : user ? "Reserve" : "Login to Reserve"}
+                    {washer.status === "Out of Order"
+                        ? "Under Maintenance"
+                        : user
+                        ? isDryer ? "Start Drying" : "Reserve"
+                        : `Login to ${isDryer ? "Dry" : "Reserve"}`}
                 </button>
             </div>
         </div>

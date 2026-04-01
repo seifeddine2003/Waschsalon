@@ -26,6 +26,9 @@ public class Washmachine {
     @Column(name = "isOpen")
     private Boolean isOpen;
 
+    @Column(name = "type")
+    private String type = "washer";
+
     protected Washmachine() {}
 
     public Washmachine(String machineNr, String status, Integer timeRemaining, String users, Boolean isOpen) {
@@ -34,18 +37,30 @@ public class Washmachine {
         this.timeRemaining = timeRemaining;
         this.users = users;
         this.isOpen = isOpen;
+        this.type = "washer";
     }
 
-    public Integer getMachineId() { return machineId; }
-    public String getMachineNr() { return machineNr; }
-    public String getStatus() { return status; }
-    public Integer getTimeRemaining() { return timeRemaining; }
-    public String getUsers() { return users; }
-    public Boolean getIsOpen() { return isOpen; }
+    public Washmachine(String machineNr, String status, Integer timeRemaining, String users, Boolean isOpen, String type) {
+        this.machineNr = machineNr;
+        this.status = status;
+        this.timeRemaining = timeRemaining;
+        this.users = users;
+        this.isOpen = isOpen;
+        this.type = type;
+    }
 
-    public void setMachineNr(String machineNr) { this.machineNr = machineNr; }
-    public void setStatus(String status) { this.status = status; }
-    public void setTimeRemaining(Integer timeRemaining) { this.timeRemaining = timeRemaining; }
-    public void setUsers(String users) { this.users = users; }
-    public void setIsOpen(Boolean isOpen) { this.isOpen = isOpen; }
+    public Integer getMachineId()        { return machineId; }
+    public String getMachineNr()         { return machineNr; }
+    public String getStatus()            { return status; }
+    public Integer getTimeRemaining()    { return timeRemaining; }
+    public String getUsers()             { return users; }
+    public Boolean getIsOpen()           { return isOpen; }
+    public String getType()              { return type; }
+
+    public void setMachineNr(String machineNr)           { this.machineNr = machineNr; }
+    public void setStatus(String status)                 { this.status = status; }
+    public void setTimeRemaining(Integer timeRemaining)  { this.timeRemaining = timeRemaining; }
+    public void setUsers(String users)                   { this.users = users; }
+    public void setIsOpen(Boolean isOpen)                { this.isOpen = isOpen; }
+    public void setType(String type)                     { this.type = type; }
 }

@@ -8,7 +8,8 @@ import ReservationModal from "./components/ReservationModal";
 import BalanceModal from "./components/BalanceModal";
 
 function App() {
-    const [washers, setWashers] = useState([]);
+    const [machines, setMachines] = useState([]);
+    const [view, setView] = useState("washer");
     const [user, setUser] = useState(null);
     const [reservingWasher, setReservingWasher] = useState(null);
     const [loginOpen, setLoginOpen] = useState(false);
@@ -18,7 +19,7 @@ function App() {
     useEffect(() => {
         fetch(`${API_BASE}/washmachines/all`, { headers: HEADERS })
             .then(res => res.json())
-            .then(data => setWashers(data))
+            .then(data => setMachines(data))
             .catch(err => console.error("Could not load machines:", err));
     }, []);
 
@@ -26,17 +27,19 @@ function App() {
         setUser(prev => ({ ...prev, balance: newBalance }));
     };
 
+    const displayed = machines.filter(m => (m.type || "washer") === view);
+
     return (
         <div className="dashboard-container">
             <nav className="navbar">
-                <div className="logo">🧺 laundryweb</div>
+                <div className="logo">🧺 Laundryweb</div>
                 <div className="nav-links">
                     {user ? (
                         <>
                             <span className="welcome">
                                 Welcome, {user.vorname} ·{" "}
                                 <button className="balance-btn" onClick={() => setBalanceOpen(true)}>
-                                    💳 €{user.balance.toFixed(2)}
+                                    €{user.balance.toFixed(2)}
                                 </button>
                             </span>
                             <button className="logout" onClick={() => setUser(null)}>
@@ -87,11 +90,26 @@ function App() {
                 </p>
             </header>
 
+            <div className="machine-toggle">
+                <button
+                    className={`toggle-btn ${view === "washer" ? "active" : ""}`}
+                    onClick={() => setView("washer")}
+                >
+                    Washers
+                </button>
+                <button
+                    className={`toggle-btn ${view === "dryer" ? "active" : ""}`}
+                    onClick={() => setView("dryer")}
+                >
+                    Dryers
+                </button>
+            </div>
+
             <div className="grid">
-                {washers.map(washer => (
+                {displayed.map(machine => (
                     <WasherCard
-                        key={washer.id}
-                        washer={washer}
+                        key={machine.id}
+                        washer={machine}
                         user={user}
                         onReserve={setReservingWasher}
                     />
