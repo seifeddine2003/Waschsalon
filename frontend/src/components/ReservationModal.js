@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import API_BASE, { HEADERS } from "../config";
+import API_BASE, { getHeaders } from "../config";
 
 const WASH_TYPES = [
     { label: "Quick Wash",  duration: 30, price: 2.50 },
@@ -43,7 +43,7 @@ export default function ReservationModal({ isOpen, onClose, washer, user, onBala
         setMessage("");
         setLoadingSlots(true);
 
-        fetch(`${API_BASE}/slots/available?machineId=${washer.id}`, { headers: HEADERS })
+        fetch(`${API_BASE}/slots/available?machineId=${washer.id}`, { headers: getHeaders() })
             .then(res => res.json())
             .then(data => setSlots(Array.isArray(data) ? data : []))
             .catch(() => setSlots([]))
@@ -87,7 +87,7 @@ export default function ReservationModal({ isOpen, onClose, washer, user, onBala
 
         fetch(`${API_BASE}/reservations/create`, {
             method: "POST",
-            headers: HEADERS,
+            headers: getHeaders(),
             body: JSON.stringify(payload),
         })
             .then(res => {

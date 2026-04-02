@@ -1,5 +1,7 @@
 package com.start.waschmachine.Student;
 
+import com.start.waschmachine.Security.JwtUtil;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,16 +16,20 @@ public class StudentController {
     @Autowired
     private StudentService studentService;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
     @PostMapping("/register")
-    public Student register(@RequestBody Student student) {
+    public Student register(@Valid @RequestBody Student student) {
         return studentService.registerStudent(student);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Student> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
         Student student = studentService.login(request.getEmail(), request.getPassword());
         if (student == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        return ResponseEntity.ok(student);
+        String token = jwtUtil.generateToken(student.getEmail(), student.getStudentId());
+        return ResponseEntity.ok(new AuthResponse(token, student));
     }
 
     @GetMapping("/{id}")

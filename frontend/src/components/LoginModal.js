@@ -11,8 +11,9 @@ export default function LoginModal({ isOpen, onClose, onLogin }) {
     const handleLogin = () => {
         setError("");
         login(email, password)
-            .then(user => {
-                onLogin(user);
+            .then(data => {
+                localStorage.setItem("user", JSON.stringify(data));
+                onLogin(data);
                 onClose();
             })
             .catch(() => setError("Invalid email or password."));

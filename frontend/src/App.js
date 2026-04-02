@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
-import API_BASE, { HEADERS } from "./config";
+import API_BASE, { getHeaders } from "./config";
 import WasherCard from "./components/WasherCard";
 import LoginModal from "./components/LoginModal";
 import SignupModal from "./components/SignupModal";
@@ -17,7 +17,12 @@ function App() {
     const [balanceOpen, setBalanceOpen] = useState(false);
 
     useEffect(() => {
-        fetch(`${API_BASE}/washmachines/all`, { headers: HEADERS })
+        const savedUser = localStorage.getItem("user");
+        if (savedUser) setUser(JSON.parse(savedUser));
+    }, []);
+
+    useEffect(() => {
+        fetch(`${API_BASE}/washmachines/all`, { headers: getHeaders() })
             .then(res => res.json())
             .then(data => setMachines(data))
             .catch(err => console.error("Could not load machines:", err));
@@ -42,7 +47,11 @@ function App() {
                                     €{user.balance.toFixed(2)}
                                 </button>
                             </span>
-                            <button className="logout" onClick={() => setUser(null)}>
+                            <button className="logout" onClick={() => {
+                                localStorage.removeItem("token");
+                                localStorage.removeItem("user");
+                                setUser(null);
+                            }}>
                                 Logout
                             </button>
                         </>

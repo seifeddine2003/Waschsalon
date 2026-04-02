@@ -1,6 +1,10 @@
 package com.start.waschmachine.Student;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "Student")
@@ -10,10 +14,21 @@ public class Student {
     @Column(name="`studentId`" , unique = true)
     private int studentId;
 
+    @NotBlank(message = "First name is required")
     private String vorname;
+
+    @NotBlank(message = "Last name is required")
     private String nachname;
+
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email format")
     private String email;
+
+    @JsonIgnore
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, message = "Password must be at least 8 characters")
     private String password;
+
     private double balance = 0.0;
 
     public Student() {};

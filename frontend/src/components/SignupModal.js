@@ -11,7 +11,27 @@ export default function SignupModal({ isOpen, onClose }) {
 
     if (!isOpen) return null;
 
+    const getPasswordStrength = (pwd) => {
+        if (pwd.length === 0) return null;
+        let score = 0;
+        if (pwd.length >= 8) score++;
+        if (/[A-Z]/.test(pwd)) score++;
+        if (/[0-9]/.test(pwd)) score++;
+        if (/[^A-Za-z0-9]/.test(pwd)) score++;
+        if (score <= 1) return { label: "Weak", color: "#e74c3c" };
+        if (score === 2) return { label: "Fair", color: "#e67e22" };
+        if (score === 3) return { label: "Good", color: "#f1c40f" };
+        return { label: "Strong", color: "#2ecc71" };
+    };
+
+    const strength = getPasswordStrength(password);
+
     const handleSubmit = () => {
+        if (password.length < 8) {
+            setMessage("Password must be at least 8 characters.");
+            setIsError(true);
+            return;
+        }
         register({ vorname: firstName, nachname: lastName, email, password })
             .then(() => {
                 setMessage("Sign up successful!");
@@ -55,11 +75,16 @@ export default function SignupModal({ isOpen, onClose }) {
                 />
                 <input
                     type="password"
-                    placeholder="Password"
+                    placeholder="Password (min. 8 characters)"
                     className="modal-input"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                 />
+                {strength && (
+                    <p style={{ margin: "4px 0 8px", fontSize: "13px", color: strength.color }}>
+                        Password strength: {strength.label}
+                    </p>
+                )}
 
                 <button className="modal-btn" onClick={handleSubmit}>
                     Sign Up

@@ -1,6 +1,7 @@
 package com.start.waschmachine.Student;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -9,13 +10,16 @@ public class StudentService {
     @Autowired
     private StudentRepository studentRepository;
 
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     public Student registerStudent(Student s) {
+        s.setPassword(passwordEncoder.encode(s.getPassword()));
         return studentRepository.save(s);
     }
 
     public Student login(String email, String password) {
         return studentRepository.findByEmail(email)
-                .filter(s -> s.getPassword().equals(password))
+                .filter(s -> passwordEncoder.matches(password, s.getPassword()))
                 .orElse(null);
     }
 

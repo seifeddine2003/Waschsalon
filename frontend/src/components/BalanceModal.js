@@ -3,7 +3,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { STRIPE_PUBLIC_KEY } from "../config";
 import { loadBalance } from "../api/studentApi";
-import API_BASE, { HEADERS } from "../config";
+import API_BASE, { getHeaders } from "../config";
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY);
 
@@ -31,7 +31,7 @@ function BalanceForm({ user, onClose, onBalanceUpdate }) {
             // 1. Create PaymentIntent on backend
             const res = await fetch(`${API_BASE}/payment/create-intent`, {
                 method: "POST",
-                headers: HEADERS,
+                headers: getHeaders(),
                 body: JSON.stringify({ amount: euros }),
             });
             const { clientSecret, error: serverError } = await res.json();

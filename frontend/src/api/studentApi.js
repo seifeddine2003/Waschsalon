@@ -1,22 +1,28 @@
-import API_BASE, { HEADERS } from "../config";
+import API_BASE, { getHeaders } from "../config";
 
 export const login = (email, password) =>
     fetch(`${API_BASE}/students/login`, {
         method: "POST",
-        headers: HEADERS,
+        headers: getHeaders(),
         body: JSON.stringify({ email, password })
-    }).then(res => { if (!res.ok) throw new Error(); return res.json(); });
+    }).then(res => {
+        if (!res.ok) throw new Error();
+        return res.json();
+    }).then(data => {
+        localStorage.setItem("token", data.token);
+        return data;
+    });
 
 export const register = (data) =>
     fetch(`${API_BASE}/students/register`, {
         method: "POST",
-        headers: HEADERS,
+        headers: getHeaders(),
         body: JSON.stringify(data)
     }).then(res => { if (!res.ok) throw new Error(); return res.json(); });
 
 export const loadBalance = (studentId, amountEuros) =>
     fetch(`${API_BASE}/students/${studentId}/balance/load`, {
         method: "POST",
-        headers: HEADERS,
+        headers: getHeaders(),
         body: JSON.stringify({ amount: amountEuros })
     }).then(res => { if (!res.ok) return res.json().then(e => { throw new Error(e.error); }); return res.json(); });
