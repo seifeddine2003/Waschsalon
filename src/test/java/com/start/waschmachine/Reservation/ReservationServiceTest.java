@@ -1,9 +1,12 @@
 package com.start.waschmachine.Reservation;
 
-import com.start.waschmachine.Student.Student;
-import com.start.waschmachine.Student.StudentRepository;
-import com.start.waschmachine.Washmachine.Washmachine;
-import com.start.waschmachine.Washmachine.WashmachineRepository;
+import com.start.waschmachine.application.reservation.ReservationRequest;
+import com.start.waschmachine.application.reservation.ReservationService;
+import com.start.waschmachine.application.student.IStudentService;
+import com.start.waschmachine.application.washmachine.IWashmachineService;
+import com.start.waschmachine.domain.reservation.ReservationRepository;
+import com.start.waschmachine.domain.student.Student;
+import com.start.waschmachine.domain.washmachine.Washmachine;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,7 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -21,8 +23,8 @@ import static org.mockito.Mockito.*;
 class ReservationServiceTest {
 
     @Mock private ReservationRepository reservationRepo;
-    @Mock private StudentRepository studentRepo;
-    @Mock private WashmachineRepository machineRepo;
+    @Mock private IStudentService studentService;
+    @Mock private IWashmachineService washmachineService;
 
     @InjectMocks
     private ReservationService reservationService;
@@ -30,6 +32,7 @@ class ReservationServiceTest {
     @Test
     void createReservation_success() {
         Student student = new Student("password", "test@email.com", "Doe", "John");
+        student.setBalance(10.0);
         Washmachine machine = new Washmachine("M1", "Available", null, null, true);
 
         ReservationRequest req = new ReservationRequest();
@@ -40,12 +43,13 @@ class ReservationServiceTest {
         req.setDate(LocalDate.now());
         req.setWashType("Quick Wash");
         req.setWashDuration(30);
+        req.setPrice(2.0);
 
-        when(studentRepo.findById(1)).thenReturn(Optional.of(student));
-        when(machineRepo.findById(1)).thenReturn(Optional.of(machine));
+        when(studentService.getStudent(1)).thenReturn(student);
+        when(washmachineService.getById(1)).thenReturn(machine);
         when(reservationRepo.isSlotTaken(1, "10:00", LocalDate.now())).thenReturn(false);
+        when(studentService.deductBalance(1, 2.0)).thenReturn(student);
         when(reservationRepo.save(any())).thenAnswer(i -> i.getArgument(0));
-        when(studentRepo.save(any())).thenAnswer(i -> i.getArgument(0));
 
         Map<String, Object> result = reservationService.createReservation(req);
 
@@ -66,15 +70,13 @@ class ReservationServiceTest {
         req.setStartTime("10:00");
         req.setEndTime("10:30");
         req.setDate(LocalDate.now());
-        req.setWashType("Quick Wash");
-        req.setWashDuration(30);
 
-        when(studentRepo.findById(1)).thenReturn(Optional.of(student));
-        when(machineRepo.findById(1)).thenReturn(Optional.of(machine));
+        when(studentService.getStudent(1)).thenReturn(student);
+        when(washmachineService.getById(1)).thenReturn(machine);
         when(reservationRepo.isSlotTaken(1, "10:00", LocalDate.now())).thenReturn(true);
 
         RuntimeException ex = assertThrows(RuntimeException.class,
-                                           () -> reservationService.createReservation(req));
+                () -> reservationService.createReservation(req));
 
         assertEquals("This slot is already reserved for this machine", ex.getMessage());
         verify(reservationRepo, never()).save(any());
@@ -87,10 +89,10 @@ class ReservationServiceTest {
         req.setMachineId(1);
         req.setDate(LocalDate.now());
 
-        when(studentRepo.findById(99)).thenReturn(Optional.empty());
+        when(studentService.getStudent(99)).thenReturn(null);
 
         RuntimeException ex = assertThrows(RuntimeException.class,
-                                           () -> reservationService.createReservation(req));
+                () -> reservationService.createReservation(req));
 
         assertEquals("Student not found", ex.getMessage());
     }
@@ -104,13 +106,13 @@ class ReservationServiceTest {
         req.setMachineId(99);
         req.setDate(LocalDate.now());
 
-        when(studentRepo.findById(1)).thenReturn(Optional.of(student));
-        when(machineRepo.findById(99)).thenReturn(Optional.empty());
+        when(studentService.getStudent(1)).thenReturn(student);
+        when(washmachineService.getById(99)).thenThrow(new RuntimeException("Washmachine not found"));
 
         RuntimeException ex = assertThrows(RuntimeException.class,
-                                           () -> reservationService.createReservation(req));
+                () -> reservationService.createReservation(req));
 
-        assertEquals("Machine not found", ex.getMessage());
+        assertEquals("Washmachine not found", ex.getMessage());
         verify(reservationRepo, never()).save(any());
     }
 }

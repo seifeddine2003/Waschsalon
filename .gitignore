@@ -10,3 +10,5 @@ src/target/
 
 # Local Spring config with real credentials
 src/main/resources/application.properties
+
+PROJECT_REPORT.md

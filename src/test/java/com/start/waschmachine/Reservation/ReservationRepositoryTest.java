@@ -1,9 +1,11 @@
 package com.start.waschmachine.Reservation;
 
-import com.start.waschmachine.Student.Student;
-import com.start.waschmachine.Student.StudentRepository;
-import com.start.waschmachine.Washmachine.Washmachine;
-import com.start.waschmachine.Washmachine.WashmachineRepository;
+import com.start.waschmachine.domain.reservation.Reservation;
+import com.start.waschmachine.domain.reservation.ReservationRepository;
+import com.start.waschmachine.domain.student.Student;
+import com.start.waschmachine.domain.student.StudentRepository;
+import com.start.waschmachine.domain.washmachine.Washmachine;
+import com.start.waschmachine.domain.washmachine.WashmachineRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +45,7 @@ public class ReservationRepositoryTest {
                 new Washmachine("M-01", "active", null, null, true)
         );
         student = studentRepository.save(
-                new Student("pass123", "john@example.com", "Doe", "John")
+                new Student("pass1234", "john@example.com", "Doe", "John")
         );
         today = LocalDate.now();
     }
@@ -161,5 +163,4 @@ public class ReservationRepositoryTest {
 
         assertThat(results).isEmpty();
     }
-
 }

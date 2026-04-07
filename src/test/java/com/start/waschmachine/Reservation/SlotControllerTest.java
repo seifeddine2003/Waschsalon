@@ -1,72 +1,48 @@
 package com.start.waschmachine.Reservation;
 
+import com.start.waschmachine.application.reservation.IReservationService;
+import com.start.waschmachine.infrastructure.security.JwtUtil;
+import com.start.waschmachine.infrastructure.web.SlotController;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import java.time.LocalDate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
+
 import java.util.List;
 import java.util.Map;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@WebMvcTest(SlotController.class)
+@WithMockUser
 class SlotControllerTest {
 
-    @Mock
-    private ReservationRepository reservationRepo;
+    @Autowired
+    private MockMvc mockMvc;
 
-    @InjectMocks
-    private SlotController slotController;
+    @MockBean
+    private IReservationService reservationService;
 
-    @Test
-    void getAvailableSlots_noReservations_returnsAllFutureSlots() {
-        when(reservationRepo.findByMachineIdAndDate(eq(1), any(LocalDate.class)))
-                .thenReturn(List.of());
-
-        List<Map<String, Object>> slots = slotController.getAvailableSlots(1);
-
-        assertNotNull(slots);
-        assertFalse(slots.isEmpty());
-
-        for (Map<String, Object> slot : slots) {
-            assertTrue(slot.containsKey("startTime"));
-            assertTrue(slot.containsKey("endTime"));
-        }
-    }
+    @MockBean
+    private JwtUtil jwtUtil;
 
     @Test
-    void getAvailableSlots_quickWash_blocksTwoSlots() {
-        Reservation r = mock(Reservation.class);
-        when(r.getStartTime()).thenReturn("06:00");
-        when(r.getWashDuration()).thenReturn(30);
+    void getAvailableSlots_delegatesToService() throws Exception {
+        List<Map<String, Object>> slots = List.of(
+                Map.of("startTime", "10:00", "endTime", "10:15"),
+                Map.of("startTime", "10:15", "endTime", "10:30")
+        );
+        when(reservationService.getAvailableSlots(1)).thenReturn(slots);
 
-        when(reservationRepo.findByMachineIdAndDate(eq(1), any(LocalDate.class)))
-                .thenReturn(List.of(r));
+        mockMvc.perform(get("/slots/available").param("machineId", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].startTime").value("10:00"));
 
-        List<Map<String, Object>> slots = slotController.getAvailableSlots(1);
-
-        boolean hasBlockedSlot = slots.stream()
-                .anyMatch(s -> s.get("startTime").equals("06:00")
-                        || s.get("startTime").equals("06:15")
-                        || s.get("startTime").equals("06:30"));
-
-        assertFalse(hasBlockedSlot, "Slots covered by the reservation should be blocked");
-    }
-
-    @Test
-    void getAvailableSlots_slotsAreInOrder() {
-        when(reservationRepo.findByMachineIdAndDate(eq(1), any(LocalDate.class)))
-                .thenReturn(List.of());
-
-        List<Map<String, Object>> slots = slotController.getAvailableSlots(1);
-
-        for (int i = 0; i < slots.size() - 1; i++) {
-            String current = (String) slots.get(i).get("startTime");
-            String next    = (String) slots.get(i + 1).get("startTime");
-            assertTrue(current.compareTo(next) < 0,
-                       "Slots should be in chronological order");
-        }
+        verify(reservationService, times(1)).getAvailableSlots(1);
     }
 }

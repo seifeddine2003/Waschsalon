@@ -1,13 +1,19 @@
 package com.start.waschmachine.Reservation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.start.waschmachine.Student.Student;
-import com.start.waschmachine.Washmachine.Washmachine;
+import com.start.waschmachine.application.reservation.IReservationService;
+import com.start.waschmachine.application.reservation.ReservationRequest;
+import com.start.waschmachine.domain.reservation.Reservation;
+import com.start.waschmachine.domain.student.Student;
+import com.start.waschmachine.domain.washmachine.Washmachine;
+import com.start.waschmachine.infrastructure.security.JwtUtil;
+import com.start.waschmachine.infrastructure.web.ReservationController;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
@@ -16,17 +22,22 @@ import java.util.List;
 import java.util.Map;
 
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ReservationController.class)
+@WithMockUser
 class ReservationControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
-    private ReservationService reservationService;
+    private IReservationService reservationService;
+
+    @MockBean
+    private JwtUtil jwtUtil;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -51,6 +62,7 @@ class ReservationControllerTest {
         req.setWashDuration(30);
 
         mockMvc.perform(post("/reservations/create")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
@@ -73,6 +85,7 @@ class ReservationControllerTest {
         req.setWashDuration(30);
 
         mockMvc.perform(post("/reservations/create")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isConflict())

@@ -1,10 +1,14 @@
 package com.start.waschmachine.Student;
 
+import com.start.waschmachine.application.student.StudentService;
+import com.start.waschmachine.domain.student.Student;
+import com.start.waschmachine.domain.student.StudentRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Optional;
 
@@ -20,7 +24,6 @@ class StudentServiceTest {
     @InjectMocks
     private StudentService studentService;
 
-    // ===== TEST 1: register a student =====
     @Test
     void registerStudent_success() {
         Student student = new Student("password123", "john@email.com", "Doe", "John");
@@ -35,10 +38,10 @@ class StudentServiceTest {
         verify(studentRepository, times(1)).save(student);
     }
 
-    // ===== TEST 2: login with correct credentials =====
     @Test
     void login_correctCredentials_returnsStudent() {
-        Student student = new Student("password123", "john@email.com", "Doe", "John");
+        String hashed = new BCryptPasswordEncoder().encode("password123");
+        Student student = new Student(hashed, "john@email.com", "Doe", "John");
 
         when(studentRepository.findByEmail("john@email.com")).thenReturn(Optional.of(student));
 
@@ -48,7 +51,6 @@ class StudentServiceTest {
         assertEquals("john@email.com", result.getEmail());
     }
 
-    // ===== TEST 3: login with wrong password =====
     @Test
     void login_wrongPassword_returnsNull() {
         Student student = new Student("password123", "john@email.com", "Doe", "John");
@@ -60,7 +62,6 @@ class StudentServiceTest {
         assertNull(result);
     }
 
-    // ===== TEST 4: login with unknown email =====
     @Test
     void login_unknownEmail_returnsNull() {
         when(studentRepository.findByEmail("unknown@email.com")).thenReturn(Optional.empty());
@@ -70,7 +71,6 @@ class StudentServiceTest {
         assertNull(result);
     }
 
-    // ===== TEST 5: get student by id — found =====
     @Test
     void getStudent_found_returnsStudent() {
         Student student = new Student("password123", "john@email.com", "Doe", "John");
@@ -83,7 +83,6 @@ class StudentServiceTest {
         assertEquals("Doe", result.getNachname());
     }
 
-    // ===== TEST 6: get student by id — not found =====
     @Test
     void getStudent_notFound_returnsNull() {
         when(studentRepository.findById(99)).thenReturn(Optional.empty());

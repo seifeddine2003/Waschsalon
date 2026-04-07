@@ -2,16 +2,19 @@ package com.start.waschmachine.Reservation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.start.waschmachine.Student.Student;
-import com.start.waschmachine.Student.StudentRepository;
-import com.start.waschmachine.Washmachine.Washmachine;
-import com.start.waschmachine.Washmachine.WashmachineRepository;
+import com.start.waschmachine.application.reservation.ReservationRequest;
+import com.start.waschmachine.domain.reservation.ReservationRepository;
+import com.start.waschmachine.domain.student.Student;
+import com.start.waschmachine.domain.student.StudentRepository;
+import com.start.waschmachine.domain.washmachine.Washmachine;
+import com.start.waschmachine.domain.washmachine.WashmachineRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 @ActiveProfiles("test")
-
+@WithMockUser
 public class ReservationFlowIntegrationTest {
 
     @Autowired
@@ -54,7 +57,7 @@ public class ReservationFlowIntegrationTest {
                 new Washmachine("M-01", "active", null, null, true)
         );
         student = studentRepository.save(
-                new Student("pass123", "john@example.com", "Doe", "John")
+                new Student("pass1234", "john@example.com", "Doe", "John")
         );
     }
 
@@ -69,7 +72,6 @@ public class ReservationFlowIntegrationTest {
         req.setWashDuration(45);
         return req;
     }
-
 
     @Test
     void createReservation_shouldReturn200_whenSlotIsFree() throws Exception {
@@ -87,13 +89,11 @@ public class ReservationFlowIntegrationTest {
     void createReservation_shouldReturn409_whenSlotIsAlreadyTaken() throws Exception {
         ReservationRequest req = buildRequest("10:00", "10:45", LocalDate.now().plusDays(1));
 
-        // First booking succeeds
         mockMvc.perform(post("/reservations/create")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
 
-        // Same slot should conflict
         mockMvc.perform(post("/reservations/create")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(req)))
@@ -122,7 +122,7 @@ public class ReservationFlowIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isConflict())
-                .andExpect(content().string(containsString("Machine not found")));
+                .andExpect(content().string(containsString("Washmachine not found")));
     }
 
     @Test

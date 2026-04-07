@@ -5,7 +5,6 @@ com\start\waschmachine\Student\Student.class
 com\start\waschmachine\Washmachine\Washmachine.class
 com\start\waschmachine\Reservation\ReservationService.class
 com\start\waschmachine\Washmachine\WashmachineRepository.class
-com\start\waschmachine\Slot\SlotController.class
 com\start\waschmachine\Student\StudentService.class
 com\start\waschmachine\Washmachine\WashmachineService.class
 com\start\waschmachine\Reservation\ReservationRepository.class
