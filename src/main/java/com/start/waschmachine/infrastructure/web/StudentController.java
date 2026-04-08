@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+
 @RestController
 @RequestMapping("/students")
 public class StudentController {
@@ -47,12 +48,7 @@ public class StudentController {
     }
 
     @PostMapping("/{id}/balance/load")
-    public ResponseEntity<?> loadBalance(@PathVariable int id, @RequestBody LoadBalanceRequest request) {
-        try {
-            Student student = studentService.loadBalance(id, request.getAmount());
-            return ResponseEntity.ok(student);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+    public ResponseEntity<Student> loadBalance(@PathVariable int id, @RequestBody LoadBalanceRequest request) {
+        return ResponseEntity.ok(studentService.loadBalance(id, request.getAmount()));
     }
 }

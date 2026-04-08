@@ -8,5 +8,6 @@ import java.util.Map;
 public interface IReservationService {
     Map<String, Object> createReservation(ReservationRequest req);
     List<Reservation> getAll();
+    List<Reservation> getByStudent(Integer studentId);
     List<Map<String, Object>> getAvailableSlots(Integer machineId);
 }

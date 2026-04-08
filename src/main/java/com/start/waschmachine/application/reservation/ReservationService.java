@@ -72,6 +72,10 @@ public class ReservationService implements IReservationService {
         return reservationRepo.findAll();
     }
 
+    public List<Reservation> getByStudent(Integer studentId) {
+        return reservationRepo.findByStudentId(studentId);
+    }
+
     public List<Map<String, Object>> getAvailableSlots(Integer machineId) {
         LocalDate today = LocalDate.now();
         LocalTime now = LocalTime.now();

@@ -15,15 +15,9 @@ public class PaymentController {
     private IPaymentService paymentService;
 
     @PostMapping("/create-intent")
-    public ResponseEntity<?> createPaymentIntent(@RequestBody Map<String, Object> body) {
-        try {
-            double amountEuros = ((Number) body.get("amount")).doubleValue();
-            String clientSecret = paymentService.createPaymentIntent(amountEuros);
-            return ResponseEntity.ok(Map.of("clientSecret", clientSecret));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
-        }
+    public ResponseEntity<Map<String, String>> createPaymentIntent(@RequestBody Map<String, Object> body) throws Exception {
+        double amountEuros = ((Number) body.get("amount")).doubleValue();
+        String clientSecret = paymentService.createPaymentIntent(amountEuros);
+        return ResponseEntity.ok(Map.of("clientSecret", clientSecret));
     }
 }

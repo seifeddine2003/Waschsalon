@@ -4,7 +4,6 @@ import com.start.waschmachine.application.reservation.IReservationService;
 import com.start.waschmachine.application.reservation.ReservationRequest;
 import com.start.waschmachine.domain.reservation.Reservation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,17 +18,17 @@ public class ReservationController {
     private IReservationService service;
 
     @PostMapping("/create")
-    public ResponseEntity<?> create(@RequestBody ReservationRequest request) {
-        try {
-            Map<String, Object> result = service.createReservation(request);
-            return ResponseEntity.ok(result);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        }
+    public ResponseEntity<Map<String, Object>> create(@RequestBody ReservationRequest request) {
+        return ResponseEntity.ok(service.createReservation(request));
     }
 
     @GetMapping("/all")
     public List<Reservation> getAll() {
         return service.getAll();
+    }
+
+    @GetMapping("/student/{studentId}")
+    public List<Reservation> getByStudent(@PathVariable Integer studentId) {
+        return service.getByStudent(studentId);
     }
 }

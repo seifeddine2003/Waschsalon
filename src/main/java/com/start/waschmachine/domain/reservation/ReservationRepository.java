@@ -25,4 +25,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
             "AND r.status = 'active'")
     List<Reservation> findByMachineIdAndDate(@Param("machineId") Integer machineId,
                                              @Param("date") LocalDate date);
+
+    @Query("SELECT r FROM Reservation r WHERE r.student.studentId = :studentId ORDER BY r.date DESC, r.startTime DESC")
+    List<Reservation> findByStudentId(@Param("studentId") Integer studentId);
 }
