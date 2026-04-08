@@ -2,7 +2,7 @@
 # Ignore unnecessary folders inside frontend/src
 frontend/node_modules/
 frontend/build/
-src/target/
+target/
 
 # Environment variables - never commit secrets
 .env
