@@ -879,3 +879,98 @@ body {
 .card-element-wrap:focus-within {
   border-color: var(--primary-purple);
 }
+
+/* ================= MY RESERVATIONS MODAL ================= */
+.my-reservations-modal {
+  width: 620px;
+  max-width: 95vw;
+  text-align: left;
+  padding: 28px;
+}
+
+.my-reservations-title {
+  margin: 0 0 20px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.my-reservations-loading,
+.my-reservations-empty {
+  font-size: 0.9rem;
+  color: var(--text-gray);
+  text-align: center;
+  margin: 24px 0;
+}
+
+.reservations-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+}
+
+.reservations-table th {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 2px solid var(--border-light);
+  font-weight: 600;
+  color: var(--text-gray);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.reservations-table td {
+  padding: 10px;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-dark);
+}
+
+.reservation-status {
+  font-weight: 600;
+  font-size: 0.78rem;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.reservation-status.active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.reservation-status.cancelled {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.reservation-status.washing {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.reservation-status.finished {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.reservation-cancel-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 5px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.reservation-cancel-btn:hover:not(:disabled) {
+  background: #dc2626;
+}
+
+.reservation-cancel-btn:disabled {
+  background: #fca5a5;
+  cursor: not-allowed;
+}

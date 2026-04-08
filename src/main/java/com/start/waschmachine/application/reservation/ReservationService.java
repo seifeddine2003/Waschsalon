@@ -68,6 +68,37 @@ public class ReservationService implements IReservationService {
         return response;
     }
 
+    @Transactional
+    public Map<String, Object> cancelReservation(Integer reservationId, Integer studentId) {
+        Reservation reservation = reservationRepo.findById(reservationId)
+                .orElseThrow(() -> new RuntimeException("Reservation not found"));
+
+        if (reservation.getStudent().getStudentId() != studentId)
+            throw new RuntimeException("Reservation does not belong to this student");
+
+        if (!"active".equals(reservation.getStatus()))
+            throw new RuntimeException("Reservation is already cancelled");
+
+        LocalTime start = LocalTime.parse(reservation.getStartTime(), DateTimeFormatter.ofPattern("HH:mm"));
+
+        if (!start.isAfter(LocalTime.now()))
+            throw new RuntimeException("Cannot cancel a reservation that has already started");
+
+        double refund = reservation.getPrice() != null ? reservation.getPrice() : 0.0;
+
+        reservation.setStatus("cancelled");
+        reservationRepo.save(reservation);
+
+        Student student = studentService.refundBalance(studentId, refund);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("reservationId", reservationId);
+        response.put("status", "cancelled");
+        response.put("refunded", refund);
+        response.put("newBalance", student.getBalance());
+        return response;
+    }
+
     public List<Reservation> getAll() {
         return reservationRepo.findAll();
     }

@@ -89,7 +89,7 @@ class ReservationControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isConflict())
-                .andExpect(content().string("This slot is already reserved for this machine"));
+                .andExpect(jsonPath("$.error").value("This slot is already reserved for this machine"));
     }
 
     @Test

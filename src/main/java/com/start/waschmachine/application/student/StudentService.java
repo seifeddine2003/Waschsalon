@@ -38,6 +38,14 @@ public class StudentService implements IStudentService {
         return studentRepository.save(student);
     }
 
+    public Student refundBalance(int id, double amount) {
+        Student student = studentRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Student not found")
+        );
+        student.setBalance(student.getBalance() + amount);
+        return studentRepository.save(student);
+    }
+
     public Student deductBalance(int id, double amount) {
         Student student = studentRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Student not found")

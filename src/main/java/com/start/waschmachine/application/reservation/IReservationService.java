@@ -10,4 +10,5 @@ public interface IReservationService {
     List<Reservation> getAll();
     List<Reservation> getByStudent(Integer studentId);
     List<Map<String, Object>> getAvailableSlots(Integer machineId);
+    Map<String, Object> cancelReservation(Integer reservationId, Integer studentId);
 }

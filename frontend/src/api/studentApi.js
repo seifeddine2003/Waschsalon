@@ -26,3 +26,14 @@ export const loadBalance = (studentId, amountEuros) =>
         headers: getHeaders(),
         body: JSON.stringify({ amount: amountEuros })
     }).then(res => { if (!res.ok) return res.json().then(e => { throw new Error(e.error); }); return res.json(); });
+
+export const getMyReservations = (studentId) =>
+    fetch(`${API_BASE}/reservations/student/${studentId}`, {
+        headers: getHeaders()
+    }).then(res => { if (!res.ok) throw new Error(); return res.json(); });
+
+export const cancelReservation = (reservationId, studentId) =>
+    fetch(`${API_BASE}/reservations/${reservationId}/cancel?studentId=${studentId}`, {
+        method: "DELETE",
+        headers: getHeaders()
+    }).then(res => { if (!res.ok) return res.json().then(e => { throw new Error(e.error || "Cancel failed"); }); return res.json(); });

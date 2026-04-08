@@ -8,4 +8,5 @@ public interface IStudentService {
     Student getStudent(int id);
     Student loadBalance(int id, double amountEuros);
     Student deductBalance(int id, double amount);
+    Student refundBalance(int id, double amount);
 }

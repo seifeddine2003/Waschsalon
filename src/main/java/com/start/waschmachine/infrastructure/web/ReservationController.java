@@ -31,4 +31,11 @@ public class ReservationController {
     public List<Reservation> getByStudent(@PathVariable Integer studentId) {
         return service.getByStudent(studentId);
     }
+
+    @DeleteMapping("/{reservationId}/cancel")
+    public ResponseEntity<Map<String, Object>> cancel(
+            @PathVariable Integer reservationId,
+            @RequestParam Integer studentId) {
+        return ResponseEntity.ok(service.cancelReservation(reservationId, studentId));
+    }
 }

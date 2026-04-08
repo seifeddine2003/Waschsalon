@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.start.waschmachine.WaschmachineApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.496 s -- in com.start.waschmachine.WaschmachineApplicationTests

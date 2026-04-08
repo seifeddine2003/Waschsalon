@@ -6,6 +6,7 @@ import LoginModal from "./components/LoginModal";
 import SignupModal from "./components/SignupModal";
 import ReservationModal from "./components/ReservationModal";
 import BalanceModal from "./components/BalanceModal";
+import MyReservationsModal from "./components/MyReservationsModal";
 
 function App() {
     const [machines, setMachines] = useState([]);
@@ -15,6 +16,7 @@ function App() {
     const [loginOpen, setLoginOpen] = useState(false);
     const [signupOpen, setSignupOpen] = useState(false);
     const [balanceOpen, setBalanceOpen] = useState(false);
+    const [myReservationsOpen, setMyReservationsOpen] = useState(false);
 
     useEffect(() => {
         const savedUser = localStorage.getItem("user");
@@ -47,6 +49,9 @@ function App() {
                                     €{user.balance.toFixed(2)}
                                 </button>
                             </span>
+                            <button className="nav-btn" onClick={() => setMyReservationsOpen(true)}>
+                                My Reservations
+                            </button>
                             <button className="logout" onClick={() => {
                                 localStorage.removeItem("token");
                                 localStorage.removeItem("user");
@@ -68,6 +73,12 @@ function App() {
                 </div>
             </nav>
 
+            <MyReservationsModal
+                isOpen={myReservationsOpen}
+                user={user}
+                onClose={() => setMyReservationsOpen(false)}
+                onBalanceUpdate={handleBalanceUpdate}
+            />
             <BalanceModal
                 isOpen={balanceOpen}
                 user={user}
