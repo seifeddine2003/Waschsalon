@@ -22,6 +22,7 @@ public class StudentService implements IStudentService {
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public Student registerStudent(Student s) {
+        s.setRole("STUDENT");
         s.setPassword(passwordEncoder.encode(s.getPassword()));
         Student saved = studentRepository.save(s);
         log.info("New student registered: {} (id={})", saved.getEmail(), saved.getStudentId());

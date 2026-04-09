@@ -1,9 +1,0 @@
-com\start\waschmachine\Reservation\ReservationRepositoryTest.class
-com\start\waschmachine\Reservation\ReservationControllerTest.class
-com\start\waschmachine\Reservation\ReservationServiceTest.class
-com\start\waschmachine\WaschmachineApplicationTests.class
-com\start\waschmachine\Reservation\SlotControllerTest.class
-com\start\waschmachine\Reservation\ReservationFlowIntegrationTest.class
-com\start\waschmachine\Student\StudentServiceTest.class
-com\start\waschmachine\Washmachine\WashmachineControllerTest.class
-com\start\waschmachine\Student\StudentControllerTest.class
