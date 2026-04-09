@@ -8,6 +8,8 @@ import com.start.waschmachine.domain.student.Student;
 import com.start.waschmachine.domain.washmachine.Washmachine;
 import com.start.waschmachine.exception.ReservationConflictException;
 import com.start.waschmachine.exception.ReservationNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,8 @@ import java.util.*;
 
 @Service
 public class ReservationService implements IReservationService {
+
+    private static final Logger log = LoggerFactory.getLogger(ReservationService.class);
 
     @Autowired
     private ReservationRepository reservationRepo;
@@ -40,6 +44,7 @@ public class ReservationService implements IReservationService {
         boolean exists = reservationRepo.isSlotTaken(req.getMachineId(), req.getStartTime(), req.getDate());
 
         if (exists) {
+            log.warn("Slot conflict: machineId={}, time={}, date={}", req.getMachineId(), req.getStartTime(), req.getDate());
             throw new ReservationConflictException("This slot is already reserved for this machine");
         }
 
@@ -54,6 +59,9 @@ public class ReservationService implements IReservationService {
         reservation.setPrice(price);
 
         reservationRepo.save(reservation);
+        log.info("Reservation created: id={}, student={}, machine={}, date={}, time={}-{}",
+                reservation.getReservationId(), req.getStudentId(), req.getMachineId(),
+                req.getDate(), req.getStartTime(), req.getEndTime());
 
         Map<String, Object> response = new HashMap<>();
         response.put("reservationId", reservation.getReservationId());
@@ -84,6 +92,7 @@ public class ReservationService implements IReservationService {
 
         reservation.cancel();
         reservationRepo.save(reservation);
+        log.info("Reservation cancelled: id={}, student={}, refund=€{}", reservationId, studentId, refund);
 
         Student student = studentService.refundBalance(studentId, refund);
 

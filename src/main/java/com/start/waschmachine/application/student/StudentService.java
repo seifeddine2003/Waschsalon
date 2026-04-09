@@ -3,6 +3,8 @@ package com.start.waschmachine.application.student;
 import com.start.waschmachine.domain.student.Student;
 import com.start.waschmachine.domain.student.StudentRepository;
 import com.start.waschmachine.exception.StudentNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class StudentService implements IStudentService {
 
+    private static final Logger log = LoggerFactory.getLogger(StudentService.class);
+
     @Autowired
     private StudentRepository studentRepository;
 
@@ -19,12 +23,18 @@ public class StudentService implements IStudentService {
 
     public Student registerStudent(Student s) {
         s.setPassword(passwordEncoder.encode(s.getPassword()));
-        return studentRepository.save(s);
+        Student saved = studentRepository.save(s);
+        log.info("New student registered: {} (id={})", saved.getEmail(), saved.getStudentId());
+        return saved;
     }
 
     public Student login(String email, String password) {
         return studentRepository.findByEmail(email)
-                .filter(s -> passwordEncoder.matches(password, s.getPassword()))
+                .filter(s -> {
+                    boolean match = passwordEncoder.matches(password, s.getPassword());
+                    if (!match) log.warn("Failed login attempt for email: {}", email);
+                    return match;
+                })
                 .orElse(null);
     }
 
@@ -38,18 +48,24 @@ public class StudentService implements IStudentService {
         }
         Student student = studentRepository.findById(id).orElseThrow(() -> new StudentNotFoundException(id));
         student.refundBalance(amount);
-        return studentRepository.save(student);
+        Student saved = studentRepository.save(student);
+        log.info("Balance loaded: student={}, amount=€{}, newBalance=€{}", id, amount, saved.getBalance());
+        return saved;
     }
 
     public Student refundBalance(int id, BigDecimal amount) {
         Student student = studentRepository.findById(id).orElseThrow(() -> new StudentNotFoundException(id));
         student.refundBalance(amount);
-        return studentRepository.save(student);
+        Student saved = studentRepository.save(student);
+        log.info("Balance refunded: student={}, amount=€{}, newBalance=€{}", id, amount, saved.getBalance());
+        return saved;
     }
 
     public Student deductBalance(int id, BigDecimal amount) {
         Student student = studentRepository.findById(id).orElseThrow(() -> new StudentNotFoundException(id));
         student.deductBalance(amount);
-        return studentRepository.save(student);
+        Student saved = studentRepository.save(student);
+        log.info("Balance deducted: student={}, amount=€{}, newBalance=€{}", id, amount, saved.getBalance());
+        return saved;
     }
 }
