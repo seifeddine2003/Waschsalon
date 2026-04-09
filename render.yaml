@@ -1,6 +1,4 @@
 services:
   - type: web
     name: laundryweb-backend
-    env: java
-    buildCommand: ./mvnw clean package -DskipTests
-    startCommand: java -jar target/*.jar
+    env: docker
