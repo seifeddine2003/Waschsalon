@@ -1,10 +1,13 @@
 package com.start.waschmachine.domain.student;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.start.waschmachine.exception.InsufficientBalanceException;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "Student")
@@ -29,7 +32,9 @@ public class Student {
     @Size(min = 8, message = "Password must be at least 8 characters")
     private String password;
 
-    private double balance = 0.0;
+    private BigDecimal balance = BigDecimal.ZERO;
+
+    private String role = "STUDENT";
 
     public Student() {};
     public Student(String password, String email, String nachname, String vorname) {
@@ -58,7 +63,7 @@ public class Student {
         this.password = password;
     }
 
-    public void setBalance(double balance) {
+    public void setBalance(BigDecimal balance) {
         this.balance = balance;
     }
 
@@ -82,7 +87,19 @@ public class Student {
         return password;
     }
 
-    public double getBalance() {
+    public BigDecimal getBalance() {
         return balance;
+    }
+
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
+
+    public void deductBalance(BigDecimal amount) {
+        if (this.balance.compareTo(amount) < 0) throw new InsufficientBalanceException();
+        this.balance = this.balance.subtract(amount);
+    }
+
+    public void refundBalance(BigDecimal amount) {
+        this.balance = this.balance.add(amount);
     }
 }

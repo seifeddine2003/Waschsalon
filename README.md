@@ -1,143 +1,115 @@
-# 🧺 LaundryWeb — Student Laundry Reservation System
+# WaschSalon — Student Laundry Booking System
 
-A full-stack web application that allows students living in a dormitory to view washing machine availability and book time slots online — no more waiting in front of the laundry room.
+A full-stack web application that lets students in a dormitory book washing machines and dryers online — no more trips to the laundry room to check availability.
+
+Live demo: [waschsalon.vercel.app](https://waschsalon.vercel.app)  
+Backend API: [waschsalon.onrender.com](https://waschsalon.onrender.com)
 
 ---
 
-## Overview
+## Features
 
-LaundryWeb is a reservation platform for student dormitories. Students can:
-
-- Register and log in to their account
-- View all washing machines and their current status
-- See available time slots for a machine on a given day
-- Book a slot with a chosen wash type and duration
-- The system automatically blocks surrounding slots based on wash duration + a 15-minute buffer
+- View all washing machines and dryers with live status
+- Browse available 15-minute time slots (06:00–23:00), with occupied windows and cleanup buffers automatically blocked
+- Book a slot with a chosen wash type and pay from an in-app balance
+- Load balance via Stripe (credit card)
+- Cancel active reservations and receive a full refund
+- JWT-based authentication with role-based access control (`STUDENT` / `ADMIN`)
+- Passwords hashed with BCrypt — never stored or returned in plaintext
+- All monetary values stored as `BigDecimal` — no floating-point precision issues
 
 ---
 
 ## Tech Stack
 
-| Layer     | Technology                        |
-|-----------|-----------------------------------|
-| Frontend  | React 18, plain CSS               |
-| Backend   | Spring Boot 3.5, Java 21          |
-| Database  | MySQL (production), H2 (testing)  |
-| ORM       | Hibernate / Spring Data JPA       |
-| API Docs  | SpringDoc OpenAPI (Swagger UI)    |
-| Testing   | JUnit 5, Mockito, MockMvc         |
+| Layer | Technology |
+|-------|-----------|
+| Backend | Java 21 + Spring Boot 3.5 |
+| Frontend | React 18 |
+| Database | Supabase/PostgreSQL (production), H2 (tests) |
+| ORM | Spring Data JPA + Hibernate |
+| Auth | JWT (JJWT 0.12) + BCrypt |
+| Payments | Stripe Java SDK |
+| Deployment | Docker + Render (backend), Vercel (frontend), Supabase (database) |
 
 ---
 
 ## Architecture
 
+The backend follows **Onion Architecture** — three concentric layers where dependencies only point inward.
+
 ```
-┌─────────────────────┐
-│     React Frontend  │  http://localhost:3000
-│  App.js             │
-│  WasherCard.js      │
-│  LoginModal.js      │
-│  SignupModal.js      │
-└────────┬────────────┘
-         │ HTTP (fetch)
-         ▼
-┌─────────────────────┐
-│   Spring Boot API   │  http://localhost:8080
-│                     │
-│  /students          │
-│  /washmachines      │
-│  /slots             │
-│  /reservations      │
-└────────┬────────────┘
-         │ JPA / Hibernate
-         ▼
-┌─────────────────────┐
-│      MySQL DB       │
-│                     │
-│  Student            │
-│  Washmachine        │
-│  Reservation        │
-└─────────────────────┘
+domain/          ← Entities, repository interfaces. No framework imports.
+application/     ← Business logic, service interfaces + implementations.
+infrastructure/  ← Spring controllers, JWT security, HTTP config.
+exception/       ← Typed exception hierarchy (NotFoundException, ConflictException, etc.)
 ```
+
+The `domain` and `application` layers have zero knowledge of Spring MVC or HTTP. Swapping any infrastructure concern (controller, security, database driver) does not require touching business logic.
 
 ---
 
-## Project Structure
+## API Endpoints
 
-### Backend (`src/main/java/com/start/waschmachine/`)
+### Public — no token required
 
-```
-├── Reservation/
-│   ├── Reservation.java              # Entity
-│   ├── ReservationController.java    # POST /reservations/create, GET /reservations/all
-│   ├── ReservationRepository.java    # isSlotTaken(), findByMachineIdAndDate()
-│   ├── ReservationRequest.java       # DTO for incoming requests
-│   ├── ReservationService.java       # Business logic
-│   └── SlotController.java           # GET /slots/available
-│
-├── Student/
-│   ├── Student.java                  # Entity
-│   ├── StudentController.java        # POST /students/register, POST /students/login
-│   ├── StudentRepository.java
-│   ├── StudentService.java
-│   └── LoginRequest.java             # DTO
-│
-├── Washmachine/
-│   ├── Washmachine.java              # Entity
-│   ├── WashmachineController.java    # GET /washmachines/all
-│   ├── WashmachineRepository.java
-│   └── WashmachineService.java
-│
-└── WaschmachineApplication.java      # Entry point
-```
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/students/register` | Register a new student account |
+| POST | `/students/login` | Authenticate — returns a JWT token |
+| GET | `/washmachines/all` | List all machines and their current status |
+| GET | `/slots/available?machineId={id}` | List available time slots for a machine today |
 
-### Frontend (`src/`)
+### Student — requires `STUDENT` role
 
-```
-├── App.js              # Main component, fetches machines, handles auth state
-├── App.css             # Global styles
-├── WasherCard.js       # Displays a single washing machine card
-├── LoginModal.js       # Login form modal
-├── SignupModal.js       # Registration form modal
-├── index.js            # React entry point
-└── index.html          # HTML template
-```
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/students/{id}` | Get student profile |
+| GET | `/students/{id}/balance` | Get current balance |
+| POST | `/students/{id}/balance/load` | Load balance (minimum €5) |
+| POST | `/reservations/create` | Book a time slot |
+| GET | `/reservations/student/{id}` | List this student's reservations |
+| DELETE | `/reservations/{id}/cancel?studentId=` | Cancel a reservation and get a refund |
+| POST | `/payment/create-intent` | Create a Stripe PaymentIntent |
+
+### Admin — requires `ADMIN` role
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/reservations/all` | List all reservations across all students |
 
 ---
 
-## Getting Started
+## Running Locally
 
 ### Prerequisites
 
 - Java 21
 - Node.js 18+
-- MySQL 8+
-- Maven
+- PostgreSQL running locally
 
-### 1. Database Setup
+### 1. Configure environment
 
-Create a MySQL database and update `src/main/resources/application.properties`:
+Create a `.env` file in the project root:
 
-```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/laundry_db
-spring.datasource.username=your_username
-spring.datasource.password=your_password
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
+```
+DATABASE_URL=jdbc:postgresql://localhost:5432/waschmachine
+DATABASE_USERNAME=your_db_user
+DATABASE_PASSWORD=your_db_password
+JWT_SECRET=a_secret_key_at_least_32_characters_long
+JWT_EXPIRATION=86400000
+STRIPE_SECRET_KEY=sk_test_...
 ```
 
-### 2. Run the Backend
+### 2. Run the backend
 
 ```bash
-cd waschmachine
-mvn spring-boot:run
+./mvnw spring-boot:run
 ```
 
-The API will be available at `http://localhost:8080`
+API available at `http://localhost:8080`.
 
-Swagger UI: `http://localhost:8080/swagger-ui.html`
-
-### 3. Run the Frontend
+### 3. Run the frontend
 
 ```bash
 cd frontend
@@ -145,194 +117,98 @@ npm install
 npm start
 ```
 
-The app will open at `http://localhost:3000`
+Frontend opens at `http://localhost:3000`.
 
 ---
 
-## API Reference
+## Running Tests
 
-### Students
-
-#### Register a new student
-```
-POST /students/register
-Content-Type: application/json
-
-{
-  "vorname": "John",
-  "nachname": "Doe",
-  "email": "**********",
-  "password": "*******"
-}
-```
-**Response:** `200 OK` — returns the created Student object
-
----
-
-#### Login
-```
-POST /students/login
-Content-Type: application/json
-
-{
-  "email": "john@dorm.com",
-  "password": "secret123"
-}
-```
-**Response:** `200 OK` — returns the Student object  
-**Response:** `401 Unauthorized` — if credentials are wrong
-
----
-
-#### Get a student by ID
-```
-GET /students/{id}
-```
-**Response:** `200 OK` — returns the Student object
-
----
-
-### Washing Machines
-
-#### Get all machines
-```
-GET /washmachines/all
-```
-**Response:** `200 OK`
-```json
-[
-  {
-    "id": 1,
-    "name": "WM1",
-    "status": "Available",
-    "timeRemaining": null,
-    "users": null,
-    "isOpen": true
-  }
-]
+```bash
+./mvnw test
 ```
 
-Possible status values: `Available`, `In Use`, `Out of Order`
+40 tests — unit tests (services, controllers via MockMvc) and integration tests (full HTTP stack against an in-memory H2 database).
 
----
-
-### Slots
-
-#### Get available slots for a machine today
-```
-GET /slots/available?machineId=1
-```
-**Response:** `200 OK`
-```json
-[
-  { "startTime": "10:00", "endTime": "10:15" },
-  { "startTime": "10:15", "endTime": "10:30" },
-  { "startTime": "10:30", "endTime": "10:45" }
-]
-```
-
-Slots are 15-minute increments from 06:00 to 23:00. Past slots are excluded. Slots blocked by existing reservations (wash duration + 15-minute cleanup buffer) are excluded.
-
----
-
-### Reservations
-
-#### Create a reservation
-```
-POST /reservations/create
-Content-Type: application/json
-
-{
-  "studentId": 1,
-  "machineId": 1,
-  "startTime": "10:00",
-  "endTime": "10:45",
-  "date": "2026-04-01",
-  "washType": "Cotton",
-  "washDuration": 45
-}
-```
-**Response:** `200 OK` — returns the created Reservation object  
-**Response:** `409 Conflict` — if slot is already taken, student not found, or machine not found
-
----
-
-#### Get all reservations
-```
-GET /reservations/all
-```
-**Response:** `200 OK` — returns array of all active reservations with nested student and machine objects
+| Test Class | Type | Covers |
+|-----------|------|--------|
+| `ReservationRepositoryTest` | Repository | `isSlotTaken`, `findByMachineIdAndDate` |
+| `ReservationServiceTest` | Unit | Booking logic, slot conflict, not-found cases |
+| `ReservationControllerTest` | Unit | Controller HTTP responses |
+| `ReservationFlowIntegrationTest` | Integration | Full HTTP flow with real DB layer |
+| `SlotControllerTest` | Unit | Slot generation and blocking |
+| `StudentServiceTest` | Unit | Registration, login, balance operations |
+| `StudentControllerTest` | Unit | Student endpoints |
+| `WashmachineControllerTest` | Unit | Machine listing |
 
 ---
 
 ## Database Schema
 
 ### Student
-| Column     | Type    | Notes          |
-|------------|---------|----------------|
-| studentId  | INT     | PK, auto       |
-| vorname    | VARCHAR | First name     |
-| nachname   | VARCHAR | Last name      |
-| email      | VARCHAR | Unique         |
-| password   | VARCHAR | Plain text ⚠️  |
-| balance    | INT     | Default 0      |
+
+| Column | Type | Notes |
+|--------|------|-------|
+| studentId | INT | PK, auto-increment |
+| vorname | VARCHAR | NOT NULL |
+| nachname | VARCHAR | NOT NULL |
+| email | VARCHAR | NOT NULL, UNIQUE |
+| password | VARCHAR | BCrypt hash — never returned in API responses |
+| balance | DECIMAL | Defaults to 0 |
+| role | VARCHAR | `STUDENT` or `ADMIN` — defaults to `STUDENT` |
 
 ### Washmachine
-| Column        | Type    | Notes                        |
-|---------------|---------|------------------------------|
-| machineId     | INT     | PK, auto                     |
-| machineNr     | VARCHAR | Machine label e.g. "WM1"     |
-| status        | VARCHAR | Available / In Use / Out of Order |
-| timeRemaining | INT     | Minutes remaining (nullable) |
-| users         | VARCHAR | Comma-separated (nullable)   |
-| isOpen        | BOOLEAN |                              |
+
+| Column | Type | Notes |
+|--------|------|-------|
+| machineId | INT | PK, auto-increment |
+| machineNr | VARCHAR | Machine label, e.g. `WM1` |
+| status | VARCHAR | Available / In Use / Out of Order |
+| timeRemaining | INT | Minutes left in current cycle, nullable |
+| isOpen | BOOLEAN | Whether the machine is operational |
+| type | VARCHAR | `washer` or `dryer`, defaults to `washer` |
 
 ### Reservation
-| Column        | Type      | Notes                  |
-|---------------|-----------|------------------------|
-| reservationId | INT       | PK, auto               |
-| date          | DATE      |                        |
-| startTime     | VARCHAR   | e.g. "10:00"           |
-| endTime       | VARCHAR   | e.g. "10:45"           |
-| status        | VARCHAR   | Default "active"       |
-| washType      | VARCHAR   | e.g. "Cotton"          |
-| washDuration  | INT       | In minutes             |
-| createdAt     | DATETIME  | Auto timestamp         |
-| studentId     | INT       | FK → Student           |
-| machineId     | INT       | FK → Washmachine       |
+
+| Column | Type | Notes |
+|--------|------|-------|
+| reservationId | INT | PK, auto-increment |
+| createdAt | DATETIME | Set automatically on insert |
+| date | DATE | NOT NULL |
+| status | VARCHAR | `active` or `cancelled` |
+| startTime | VARCHAR | Format: `HH:mm` |
+| endTime | VARCHAR | Format: `HH:mm` |
+| washType | VARCHAR | e.g. Quick Wash, Normal Wash |
+| washDuration | INT | Duration in minutes |
+| price | DECIMAL | |
+| studentId | INT | FK → Student |
+| machineId | INT | FK → Washmachine |
 
 ---
 
-## Testing
+## Deployment
 
-### Run all tests
-```bash
-mvn test
-```
+The production environment uses three separate services:
 
-### Test classes
+| Service | Provider | What it runs |
+|---------|----------|-------------|
+| Frontend | [Vercel](https://vercel.com) | React app — auto-deploys on push to main |
+| Backend | [Render](https://render.com) | Spring Boot API packaged as a Docker container |
+| Database | [Supabase](https://supabase.com) | Managed PostgreSQL instance |
 
-| Class                          | Type        | What it tests                                      |
-|-------------------------------|-------------|----------------------------------------------------|
-| `ReservationRepositoryTest`   | Repository  | `isSlotTaken()`, `findByMachineIdAndDate()`        |
-| `ReservationServiceTest`      | Unit        | Booking logic, conflict detection                  |
-| `ReservationControllerTest`   | Unit        | Controller responses and error handling            |
-| `ReservationFlowIntegrationTest` | Integration | Full HTTP flow via MockMvc                      |
-| `SlotControllerTest`          | Unit        | Slot generation, blocking, ordering                |
-| `StudentServiceTest`          | Unit        | Login, registration                                |
-| `StudentControllerTest`       | Unit        | Student endpoints                                  |
-| `WashmachineControllerTest`   | Unit        | Machine listing endpoint                           |
+**How they connect:**
+- The React app on Vercel calls the Render backend via HTTPS. The backend URL is set as an environment variable in Vercel.
+- The Spring Boot app on Render connects to Supabase using a PostgreSQL connection string set as an environment variable (`DATABASE_URL`). Supabase provides the connection string from its project dashboard.
+- CORS on the backend is configured to allow requests from `waschsalon.vercel.app`.
 
-### Test configuration
-
-Tests use an in-memory H2 database. The dialect is overridden via `@TestPropertySource` to avoid MySQL-specific syntax errors.
+**Docker:** The backend is packaged into a Docker container using the `Dockerfile` in the project root. Render pulls and runs this container automatically on each deploy.
 
 ---
 
-## Known Limitations
+## Security
 
-- **Passwords are stored as plain text** — hashing (e.g. BCrypt) should be added before any real deployment
-- **No authentication/authorization** — any client can call any endpoint without being logged in
-- **No input validation** — missing `@Valid` annotations means invalid data can reach the database
-- **Slot availability is date-locked to today** — the `/slots/available` endpoint only returns slots for the current day; future date selection is not yet supported on the backend
-- **No reservation cancellation endpoint** — cancellation would need a `PATCH /reservations/{id}/cancel` endpoint
+- **Passwords** hashed with BCrypt (work factor 10). The raw password is never stored or sent in any API response.
+- **JWT tokens** are stateless, signed with HMAC-SHA, expire after 24 hours, and carry the user's role as a claim. The role is loaded into the Spring `SecurityContext` on every request by `JwtFilter`.
+- **Role-based access control** enforced at the method level with `@PreAuthorize`. Unauthenticated or under-privileged requests receive `401` or `403`.
+- **Input validation** on all request DTOs using Jakarta Bean Validation (`@NotBlank`, `@NotNull`, `@Positive`, `@DecimalMin`). Validation errors return `400` with field-level detail.
+- **CORS** restricted to known frontend origins.
+- **Money** stored as `BigDecimal` throughout — no `double` or `float` anywhere in the financial path.

@@ -2,7 +2,10 @@ package com.start.waschmachine.application.student;
 
 import com.start.waschmachine.domain.student.Student;
 import com.start.waschmachine.domain.student.StudentRepository;
+import com.start.waschmachine.exception.StudentNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.math.BigDecimal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,34 +29,27 @@ public class StudentService implements IStudentService {
     }
 
     public Student getStudent(int id) {
-        return studentRepository.findById(id).orElse(null);
+        return studentRepository.findById(id).orElseThrow(() -> new StudentNotFoundException(id));
     }
 
-    public Student loadBalance(int id, double amountEuros) {
-        if (amountEuros < 5) {
+    public Student loadBalance(int id, BigDecimal amount) {
+        if (amount.compareTo(BigDecimal.valueOf(5)) < 0) {
             throw new IllegalArgumentException("Minimum load amount is €5");
         }
-        Student student = studentRepository.findById(id).orElseThrow();
-        student.setBalance(student.getBalance() + amountEuros);
+        Student student = studentRepository.findById(id).orElseThrow(() -> new StudentNotFoundException(id));
+        student.refundBalance(amount);
         return studentRepository.save(student);
     }
 
-    public Student refundBalance(int id, double amount) {
-        Student student = studentRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Student not found")
-        );
-        student.setBalance(student.getBalance() + amount);
+    public Student refundBalance(int id, BigDecimal amount) {
+        Student student = studentRepository.findById(id).orElseThrow(() -> new StudentNotFoundException(id));
+        student.refundBalance(amount);
         return studentRepository.save(student);
     }
 
-    public Student deductBalance(int id, double amount) {
-        Student student = studentRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Student not found")
-        );
-        if (student.getBalance() < amount) {
-            throw new RuntimeException("Insufficient balance");
-        }
-        student.setBalance(student.getBalance() - amount);
+    public Student deductBalance(int id, BigDecimal amount) {
+        Student student = studentRepository.findById(id).orElseThrow(() -> new StudentNotFoundException(id));
+        student.deductBalance(amount);
         return studentRepository.save(student);
     }
 }

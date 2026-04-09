@@ -13,6 +13,12 @@ C:\Users\Seif\Desktop\Projects\waschmachine\src\main\java\com\start\waschmachine
 C:\Users\Seif\Desktop\Projects\waschmachine\src\main\java\com\start\waschmachine\domain\student\StudentRepository.java
 C:\Users\Seif\Desktop\Projects\waschmachine\src\main\java\com\start\waschmachine\domain\washmachine\Washmachine.java
 C:\Users\Seif\Desktop\Projects\waschmachine\src\main\java\com\start\waschmachine\domain\washmachine\WashmachineRepository.java
+C:\Users\Seif\Desktop\Projects\waschmachine\src\main\java\com\start\waschmachine\exception\InsufficientBalanceException.java
+C:\Users\Seif\Desktop\Projects\waschmachine\src\main\java\com\start\waschmachine\exception\NotFoundException.java
+C:\Users\Seif\Desktop\Projects\waschmachine\src\main\java\com\start\waschmachine\exception\ReservationConflictException.java
+C:\Users\Seif\Desktop\Projects\waschmachine\src\main\java\com\start\waschmachine\exception\ReservationNotFoundException.java
+C:\Users\Seif\Desktop\Projects\waschmachine\src\main\java\com\start\waschmachine\exception\StudentNotFoundException.java
+C:\Users\Seif\Desktop\Projects\waschmachine\src\main\java\com\start\waschmachine\exception\WashmachineNotFoundException.java
 C:\Users\Seif\Desktop\Projects\waschmachine\src\main\java\com\start\waschmachine\infrastructure\security\CorsConfig.java
 C:\Users\Seif\Desktop\Projects\waschmachine\src\main\java\com\start\waschmachine\infrastructure\security\JwtFilter.java
 C:\Users\Seif\Desktop\Projects\waschmachine\src\main\java\com\start\waschmachine\infrastructure\security\JwtUtil.java

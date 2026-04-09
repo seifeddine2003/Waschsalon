@@ -3,6 +3,7 @@ package com.start.waschmachine.Reservation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.start.waschmachine.application.reservation.IReservationService;
 import com.start.waschmachine.application.reservation.ReservationRequest;
+import com.start.waschmachine.exception.ReservationConflictException;
 import com.start.waschmachine.domain.reservation.Reservation;
 import com.start.waschmachine.domain.student.Student;
 import com.start.waschmachine.domain.washmachine.Washmachine;
@@ -16,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ReservationController.class)
-@WithMockUser
+@WithMockUser(roles = "STUDENT")
 class ReservationControllerTest {
 
     @Autowired
@@ -60,6 +62,7 @@ class ReservationControllerTest {
         req.setDate(LocalDate.now());
         req.setWashType("Quick Wash");
         req.setWashDuration(30);
+        req.setPrice(BigDecimal.valueOf(5));
 
         mockMvc.perform(post("/reservations/create")
                         .with(csrf())
@@ -73,7 +76,7 @@ class ReservationControllerTest {
     @Test
     void createReservation_conflict_returns409() throws Exception {
         when(reservationService.createReservation(any()))
-                .thenThrow(new RuntimeException("This slot is already reserved for this machine"));
+                .thenThrow(new ReservationConflictException("This slot is already reserved for this machine"));
 
         ReservationRequest req = new ReservationRequest();
         req.setStudentId(1);
@@ -83,6 +86,7 @@ class ReservationControllerTest {
         req.setDate(LocalDate.now());
         req.setWashType("Quick Wash");
         req.setWashDuration(30);
+        req.setPrice(BigDecimal.valueOf(5));
 
         mockMvc.perform(post("/reservations/create")
                         .with(csrf())
@@ -93,6 +97,7 @@ class ReservationControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void getAll_returnsList() throws Exception {
         Student student = new Student("password123", "john@email.com", "Doe", "John");
         Washmachine machine = new Washmachine("M1", "Available", null, null, true);

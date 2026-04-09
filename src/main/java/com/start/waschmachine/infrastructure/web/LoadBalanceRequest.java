@@ -1,8 +1,13 @@
 package com.start.waschmachine.infrastructure.web;
 
-public class LoadBalanceRequest {
-    private double amount;
+import jakarta.validation.constraints.DecimalMin;
 
-    public double getAmount() { return amount; }
-    public void setAmount(double amount) { this.amount = amount; }
+import java.math.BigDecimal;
+
+public class LoadBalanceRequest {
+    @DecimalMin("5")
+    private BigDecimal amount;
+
+    public BigDecimal getAmount() { return amount; }
+    public void setAmount(BigDecimal amount) { this.amount = amount; }
 }

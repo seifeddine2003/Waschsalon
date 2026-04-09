@@ -7,12 +7,14 @@ import com.start.waschmachine.application.washmachine.IWashmachineService;
 import com.start.waschmachine.domain.reservation.ReservationRepository;
 import com.start.waschmachine.domain.student.Student;
 import com.start.waschmachine.domain.washmachine.Washmachine;
+import com.start.waschmachine.exception.StudentNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
 
@@ -32,7 +34,7 @@ class ReservationServiceTest {
     @Test
     void createReservation_success() {
         Student student = new Student("password", "test@email.com", "Doe", "John");
-        student.setBalance(10.0);
+        student.setBalance(BigDecimal.valueOf(10));
         Washmachine machine = new Washmachine("M1", "Available", null, null, true);
 
         ReservationRequest req = new ReservationRequest();
@@ -43,12 +45,12 @@ class ReservationServiceTest {
         req.setDate(LocalDate.now());
         req.setWashType("Quick Wash");
         req.setWashDuration(30);
-        req.setPrice(2.0);
+        req.setPrice(BigDecimal.valueOf(2));
 
         when(studentService.getStudent(1)).thenReturn(student);
         when(washmachineService.getById(1)).thenReturn(machine);
         when(reservationRepo.isSlotTaken(1, "10:00", LocalDate.now())).thenReturn(false);
-        when(studentService.deductBalance(1, 2.0)).thenReturn(student);
+        when(studentService.deductBalance(1, BigDecimal.valueOf(2))).thenReturn(student);
         when(reservationRepo.save(any())).thenAnswer(i -> i.getArgument(0));
 
         Map<String, Object> result = reservationService.createReservation(req);
@@ -89,12 +91,10 @@ class ReservationServiceTest {
         req.setMachineId(1);
         req.setDate(LocalDate.now());
 
-        when(studentService.getStudent(99)).thenReturn(null);
+        when(studentService.getStudent(99)).thenThrow(new StudentNotFoundException(99));
 
-        RuntimeException ex = assertThrows(RuntimeException.class,
+        assertThrows(StudentNotFoundException.class,
                 () -> reservationService.createReservation(req));
-
-        assertEquals("Student not found", ex.getMessage());
     }
 
     @Test

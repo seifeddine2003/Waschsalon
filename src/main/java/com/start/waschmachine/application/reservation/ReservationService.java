@@ -6,10 +6,13 @@ import com.start.waschmachine.domain.reservation.Reservation;
 import com.start.waschmachine.domain.reservation.ReservationRepository;
 import com.start.waschmachine.domain.student.Student;
 import com.start.waschmachine.domain.washmachine.Washmachine;
+import com.start.waschmachine.exception.ReservationConflictException;
+import com.start.waschmachine.exception.ReservationNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -31,25 +34,21 @@ public class ReservationService implements IReservationService {
     public Map<String, Object> createReservation(ReservationRequest req) {
 
         Student student = studentService.getStudent(req.getStudentId());
-        if (student == null) throw new RuntimeException("Student not found");
 
         Washmachine machine = washmachineService.getById(req.getMachineId());
 
-        LocalDate date = req.getDate();
-
-        boolean exists = reservationRepo.isSlotTaken(
-                req.getMachineId(), req.getStartTime(), date);
+        boolean exists = reservationRepo.isSlotTaken(req.getMachineId(), req.getStartTime(), req.getDate());
 
         if (exists) {
-            throw new RuntimeException("This slot is already reserved for this machine");
+            throw new ReservationConflictException("This slot is already reserved for this machine");
         }
 
-        double price = req.getPrice() != null ? req.getPrice() : 0.0;
+        BigDecimal price = req.getPrice() != null ? req.getPrice() : BigDecimal.ZERO;
 
         student = studentService.deductBalance(req.getStudentId(), price);
 
         Reservation reservation = new Reservation(
-                student, machine, req.getStartTime(), req.getEndTime(), date);
+                student, machine, req.getStartTime(), req.getEndTime(), req.getDate());
         reservation.setWashType(req.getWashType());
         reservation.setWashDuration(req.getWashDuration());
         reservation.setPrice(price);
@@ -71,22 +70,19 @@ public class ReservationService implements IReservationService {
     @Transactional
     public Map<String, Object> cancelReservation(Integer reservationId, Integer studentId) {
         Reservation reservation = reservationRepo.findById(reservationId)
-                .orElseThrow(() -> new RuntimeException("Reservation not found"));
+                .orElseThrow(() -> new ReservationNotFoundException(reservationId));
 
         if (reservation.getStudent().getStudentId() != studentId)
-            throw new RuntimeException("Reservation does not belong to this student");
-
-        if (!"active".equals(reservation.getStatus()))
-            throw new RuntimeException("Reservation is already cancelled");
+            throw new ReservationConflictException("Reservation does not belong to this student");
 
         LocalTime start = LocalTime.parse(reservation.getStartTime(), DateTimeFormatter.ofPattern("HH:mm"));
 
         if (!start.isAfter(LocalTime.now()))
-            throw new RuntimeException("Cannot cancel a reservation that has already started");
+            throw new ReservationConflictException("Cannot cancel a reservation that has already started");
 
-        double refund = reservation.getPrice() != null ? reservation.getPrice() : 0.0;
+        BigDecimal refund = reservation.getPrice() != null ? reservation.getPrice() : BigDecimal.ZERO;
 
-        reservation.setStatus("cancelled");
+        reservation.cancel();
         reservationRepo.save(reservation);
 
         Student student = studentService.refundBalance(studentId, refund);

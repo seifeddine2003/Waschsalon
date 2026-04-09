@@ -2,9 +2,11 @@ package com.start.waschmachine.domain.reservation;
 
 import com.start.waschmachine.domain.student.Student;
 import com.start.waschmachine.domain.washmachine.Washmachine;
+import com.start.waschmachine.exception.ReservationConflictException;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -39,7 +41,7 @@ public class Reservation {
     private Integer washDuration;
 
     @Column
-    private Double price;
+    private BigDecimal price;
 
     @ManyToOne
     @JoinColumn(name = "studentId", nullable = false)
@@ -69,9 +71,14 @@ public class Reservation {
     public String getEndTime()              { return endTime; }
     public String getWashType()             { return washType; }
     public Integer getWashDuration()        { return washDuration; }
-    public Double getPrice()                { return price; }
+    public BigDecimal getPrice()            { return price; }
     public Student getStudent()             { return student; }
     public Washmachine getWashmachine()     { return washmachine; }
+
+    public void cancel() {
+        if (!"active".equals(this.status)) throw new ReservationConflictException("Reservation is already cancelled");
+        this.status = "cancelled";
+    }
 
     public void setDate(LocalDate date)         { this.date = date; }
     public void setStatus(String status)        { this.status = status; }
@@ -79,5 +86,5 @@ public class Reservation {
     public void setEndTime(String s)            { this.endTime = s; }
     public void setWashType(String s)           { this.washType = s; }
     public void setWashDuration(Integer d)      { this.washDuration = d; }
-    public void setPrice(Double p)              { this.price = p; }
+    public void setPrice(BigDecimal p)          { this.price = p; }
 }

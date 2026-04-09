@@ -2,13 +2,15 @@ package com.start.waschmachine.infrastructure.web;
 
 import com.start.waschmachine.domain.student.Student;
 
+import java.math.BigDecimal;
+
 public class AuthResponse {
     private String token;
     private int studentId;
     private String vorname;
     private String nachname;
     private String email;
-    private double balance;
+    private BigDecimal balance;
 
     public AuthResponse(String token, Student student) {
         this.token = token;
@@ -24,5 +26,5 @@ public class AuthResponse {
     public String getVorname()  { return vorname; }
     public String getNachname() { return nachname; }
     public String getEmail()    { return email; }
-    public double getBalance()  { return balance; }
+    public BigDecimal getBalance()  { return balance; }
 }

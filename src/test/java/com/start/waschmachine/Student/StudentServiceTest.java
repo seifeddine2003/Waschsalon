@@ -3,6 +3,7 @@ package com.start.waschmachine.Student;
 import com.start.waschmachine.application.student.StudentService;
 import com.start.waschmachine.domain.student.Student;
 import com.start.waschmachine.domain.student.StudentRepository;
+import com.start.waschmachine.exception.StudentNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -84,11 +85,9 @@ class StudentServiceTest {
     }
 
     @Test
-    void getStudent_notFound_returnsNull() {
+    void getStudent_notFound_throwsException() {
         when(studentRepository.findById(99)).thenReturn(Optional.empty());
 
-        Student result = studentService.getStudent(99);
-
-        assertNull(result);
+        assertThrows(StudentNotFoundException.class, () -> studentService.getStudent(99));
     }
 }

@@ -19,6 +19,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.start.waschmachine.domain.reservation.Reservation;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.hamcrest.Matchers.*;
@@ -29,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 @ActiveProfiles("test")
-@WithMockUser
+@WithMockUser(roles = "STUDENT")
 public class ReservationFlowIntegrationTest {
 
     @Autowired
@@ -56,9 +58,9 @@ public class ReservationFlowIntegrationTest {
         machine = washmachineRepository.save(
                 new Washmachine("M-01", "active", null, null, true)
         );
-        student = studentRepository.save(
-                new Student("pass1234", "john@example.com", "Doe", "John")
-        );
+        Student s = new Student("pass1234", "john@example.com", "Doe", "John");
+        s.setBalance(BigDecimal.valueOf(100));
+        student = studentRepository.save(s);
     }
 
     private ReservationRequest buildRequest(String startTime, String endTime, LocalDate date) {
@@ -70,6 +72,7 @@ public class ReservationFlowIntegrationTest {
         req.setDate(date);
         req.setWashType("cotton");
         req.setWashDuration(45);
+        req.setPrice(BigDecimal.valueOf(5));
         return req;
     }
 
@@ -109,7 +112,7 @@ public class ReservationFlowIntegrationTest {
         mockMvc.perform(post("/reservations/create")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isConflict())
+                .andExpect(status().isNotFound())
                 .andExpect(content().string(containsString("Student not found")));
     }
 
@@ -121,7 +124,7 @@ public class ReservationFlowIntegrationTest {
         mockMvc.perform(post("/reservations/create")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isConflict())
+                .andExpect(status().isNotFound())
                 .andExpect(content().string(containsString("Washmachine not found")));
     }
 
@@ -163,6 +166,7 @@ public class ReservationFlowIntegrationTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void getAll_shouldReturnEmptyList_whenNoReservations() throws Exception {
         mockMvc.perform(get("/reservations/all"))
                 .andExpect(status().isOk())
@@ -170,13 +174,13 @@ public class ReservationFlowIntegrationTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void getAll_shouldReturnAllReservations_afterCreating() throws Exception {
-        ReservationRequest req = buildRequest("10:00", "10:45", LocalDate.now().plusDays(1));
-
-        mockMvc.perform(post("/reservations/create")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isOk());
+        Reservation r = new Reservation(student, machine, "10:00", "10:45", LocalDate.now().plusDays(1));
+        r.setWashType("cotton");
+        r.setWashDuration(45);
+        r.setPrice(BigDecimal.valueOf(5));
+        reservationRepository.save(r);
 
         mockMvc.perform(get("/reservations/all"))
                 .andExpect(status().isOk())

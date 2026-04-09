@@ -3,6 +3,7 @@ com\start\waschmachine\infrastructure\web\GlobalExceptionHandler.class
 com\start\waschmachine\WaschmachineApplication.class
 com\start\waschmachine\infrastructure\security\CorsConfig.class
 com\start\waschmachine\infrastructure\web\SlotController.class
+com\start\waschmachine\exception\WashmachineNotFoundException.class
 com\start\waschmachine\application\payment\IPaymentService.class
 com\start\waschmachine\application\washmachine\WashmachineService.class
 com\start\waschmachine\infrastructure\security\JwtUtil.class
