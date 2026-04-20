@@ -69,7 +69,7 @@ The `domain` and `application` layers have zero knowledge of Spring MVC or HTTP.
 | POST | `/students/{id}/balance/load` | Load balance (minimum €5) |
 | POST | `/reservations/create` | Book a time slot |
 | GET | `/reservations/student/{id}` | List this student's reservations |
-| DELETE | `/reservations/{id}/cancel?studentId=` | Cancel a reservation and get a refund |
+| DELETE | `/reservations/{id}/cancel` | Cancel a reservation and get a refund |
 | POST | `/payment/create-intent` | Create a Stripe PaymentIntent |
 
 ### Admin — requires `ADMIN` role
@@ -209,6 +209,7 @@ The production environment uses three separate services:
 - **Passwords** hashed with BCrypt (work factor 10). The raw password is never stored or sent in any API response.
 - **JWT tokens** are stateless, signed with HMAC-SHA, expire after 24 hours, and carry the user's role as a claim. The role is loaded into the Spring `SecurityContext` on every request by `JwtFilter`.
 - **Role-based access control** enforced at the method level with `@PreAuthorize`. Unauthenticated or under-privileged requests receive `401` or `403`.
+- **Ownership enforcement** — the `studentId` stored in the JWT is used server-side to verify that students can only cancel their own reservations, view their own reservation history, and load their own balance. The client never provides the `studentId` for sensitive operations — it is always read from the verified token.
 - **Input validation** on all request DTOs using Jakarta Bean Validation (`@NotBlank`, `@NotNull`, `@Positive`, `@DecimalMin`). Validation errors return `400` with field-level detail.
 - **CORS** restricted to known frontend origins.
 - **Money** stored as `BigDecimal` throughout — no `double` or `float` anywhere in the financial path.

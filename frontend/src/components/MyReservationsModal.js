@@ -20,7 +20,7 @@ export default function MyReservationsModal({ isOpen, user, onClose, onBalanceUp
     const handleCancel = (reservationId) => {
         setCancellingId(reservationId);
         setError("");
-        cancelReservation(reservationId, user.studentId)
+        cancelReservation(reservationId)
             .then(data => {
                 setReservations(prev =>
                     prev.map(r =>

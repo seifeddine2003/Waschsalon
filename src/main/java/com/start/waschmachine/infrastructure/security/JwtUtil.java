@@ -39,6 +39,10 @@ public class JwtUtil {
         return getClaims(token).get("role", String.class);
     }
 
+    public Integer extractStudentId(String token) {
+        return getClaims(token).get("studentId", Integer.class);
+    }
+
     public boolean isValid(String token) {
         try {
             getClaims(token);

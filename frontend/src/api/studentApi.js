@@ -32,8 +32,8 @@ export const getMyReservations = (studentId) =>
         headers: getHeaders()
     }).then(res => { if (!res.ok) throw new Error(); return res.json(); });
 
-export const cancelReservation = (reservationId, studentId) =>
-    fetch(`${API_BASE}/reservations/${reservationId}/cancel?studentId=${studentId}`, {
+export const cancelReservation = (reservationId) =>
+    fetch(`${API_BASE}/reservations/${reservationId}/cancel`, {
         method: "DELETE",
         headers: getHeaders()
     }).then(res => { if (!res.ok) return res.json().then(e => { throw new Error(e.error || "Cancel failed"); }); return res.json(); });

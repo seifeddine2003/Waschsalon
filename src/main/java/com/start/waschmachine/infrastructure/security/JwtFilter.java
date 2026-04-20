@@ -29,11 +29,11 @@ public class JwtFilter extends OncePerRequestFilter {
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
             if (jwtUtil.isValid(token)) {
-                String email = jwtUtil.extractEmail(token);
+                Integer studentId = jwtUtil.extractStudentId(token);
                 String role = jwtUtil.extractRole(token);
                 var authority = new SimpleGrantedAuthority("ROLE_" + role);
                 UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(email, null, List.of(authority));
+                        new UsernamePasswordAuthenticationToken(studentId, null, List.of(authority));
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }

@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import java.util.Map;
 
 
@@ -51,7 +53,10 @@ public class StudentController {
 
     @PostMapping("/{id}/balance/load")
     @PreAuthorize("hasRole('STUDENT')")
-    public ResponseEntity<Student> loadBalance(@PathVariable int id, @Valid @RequestBody LoadBalanceRequest request) {
+    public ResponseEntity<Student> loadBalance(@PathVariable int id, @Valid @RequestBody LoadBalanceRequest request, Authentication authentication) {
+        Integer authenticatedId = (Integer) authentication.getPrincipal();
+        if (!authenticatedId.equals(id))
+            throw new AccessDeniedException("You can only load your own balance");
         return ResponseEntity.ok(studentService.loadBalance(id, request.getAmount()));
     }
 }
