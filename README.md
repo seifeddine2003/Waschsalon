@@ -16,7 +16,6 @@ Backend API: [waschsalon.onrender.com](https://waschsalon.onrender.com)
 - Cancel active reservations and receive a full refund
 - JWT-based authentication with role-based access control (`STUDENT` / `ADMIN`)
 - Passwords hashed with BCrypt — never stored or returned in plaintext
-- All monetary values stored as `BigDecimal` — no floating-point precision issues
 
 ---
 
@@ -26,11 +25,11 @@ Backend API: [waschsalon.onrender.com](https://waschsalon.onrender.com)
 |-------|-----------|
 | Backend | Java 21 + Spring Boot 3.5 |
 | Frontend | React 18 |
-| Database | Supabase/PostgreSQL (production), H2 (tests) |
+| Database | Render PostgreSQL (production), H2 (tests) |
 | ORM | Spring Data JPA + Hibernate |
 | Auth | JWT (JJWT 0.12) + BCrypt |
 | Payments | Stripe Java SDK |
-| Deployment | Docker + Render (backend), Vercel (frontend), Supabase (database) |
+| Deployment | Docker + Render (backend), Vercel (frontend) |
 
 ---
 
@@ -46,6 +45,23 @@ exception/       ← Typed exception hierarchy (NotFoundException, ConflictExcep
 ```
 
 The `domain` and `application` layers have zero knowledge of Spring MVC or HTTP. Swapping any infrastructure concern (controller, security, database driver) does not require touching business logic.
+
+---
+
+## CI/CD & Code Quality
+
+Every push to `main` runs a GitHub Actions pipeline:
+
+1. **Test** — runs all 40 unit and integration tests (`mvn test`)
+2. **Build** — packages the application (`mvn package -DskipTests`)
+3. **Deploy** — triggers a Render deploy hook only if tests pass
+
+Additional workflows run in parallel:
+
+- **CodeQL** — static security analysis on every push and weekly scan. Finds vulnerabilities like SQL injection and unsafe deserialization in the Java source.
+- **Dependabot** — opens automated PRs every Monday when Maven dependencies or GitHub Actions versions have security patches or updates available.
+
+Render's auto-deploy is disabled — all deploys go through the pipeline, so broken code can never reach production.
 
 ---
 
@@ -187,20 +203,20 @@ Frontend opens at `http://localhost:3000`.
 
 ## Deployment
 
-The production environment uses three separate services:
+The production environment uses two separate services:
 
 | Service | Provider | What it runs |
 |---------|----------|-------------|
 | Frontend | [Vercel](https://vercel.com) | React app — auto-deploys on push to main |
 | Backend | [Render](https://render.com) | Spring Boot API packaged as a Docker container |
-| Database | [Supabase](https://supabase.com) | Managed PostgreSQL instance |
+| Database | [Render](https://render.com) | Managed PostgreSQL instance |
 
 **How they connect:**
 - The React app on Vercel calls the Render backend via HTTPS. The backend URL is set as an environment variable in Vercel.
-- The Spring Boot app on Render connects to Supabase using a PostgreSQL connection string set as an environment variable (`DATABASE_URL`). Supabase provides the connection string from its project dashboard.
+- The Spring Boot app on Render connects to the PostgreSQL database using a connection string set as an environment variable (`DATABASE_URL`).
 - CORS on the backend is configured to allow requests from `waschsalon.vercel.app`.
 
-**Docker:** The backend is packaged into a Docker container using the `Dockerfile` in the project root. Render pulls and runs this container automatically on each deploy.
+**Docker:** The backend is packaged into a Docker container using the `Dockerfile` in the project root. Render pulls and runs this container automatically on each deploy triggered by the CI/CD pipeline.
 
 ---
 
@@ -210,6 +226,4 @@ The production environment uses three separate services:
 - **JWT tokens** are stateless, signed with HMAC-SHA, expire after 24 hours, and carry the user's role as a claim. The role is loaded into the Spring `SecurityContext` on every request by `JwtFilter`.
 - **Role-based access control** enforced at the method level with `@PreAuthorize`. Unauthenticated or under-privileged requests receive `401` or `403`.
 - **Ownership enforcement** — the `studentId` stored in the JWT is used server-side to verify that students can only cancel their own reservations, view their own reservation history, and load their own balance. The client never provides the `studentId` for sensitive operations — it is always read from the verified token.
-- **Input validation** on all request DTOs using Jakarta Bean Validation (`@NotBlank`, `@NotNull`, `@Positive`, `@DecimalMin`). Validation errors return `400` with field-level detail.
 - **CORS** restricted to known frontend origins.
-- **Money** stored as `BigDecimal` throughout — no `double` or `float` anywhere in the financial path.
