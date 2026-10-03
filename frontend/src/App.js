@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import "./App.css";
 import API_BASE, { getHeaders } from "./config";
 import WasherCard from "./components/WasherCard";
@@ -10,6 +10,8 @@ import MyReservationsModal from "./components/MyReservationsModal";
 
 function App() {
     const [machines, setMachines] = useState([]);
+    const [machinesLoading, setMachinesLoading] = useState(true);
+    const [machinesError, setMachinesError] = useState(false);
     const [view, setView] = useState("washer");
     const [user, setUser] = useState(null);
     const [reservingWasher, setReservingWasher] = useState(null);
@@ -23,12 +25,27 @@ function App() {
         if (savedUser) setUser(JSON.parse(savedUser));
     }, []);
 
-    useEffect(() => {
+    const loadMachines = useCallback(() => {
+        setMachinesLoading(true);
+        setMachinesError(false);
+
+        // Fetch as soon as the app opens: this also wakes a sleeping backend.
         fetch(`${API_BASE}/washmachines/all`, { headers: getHeaders() })
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) throw new Error(`Request failed (${res.status})`);
+                return res.json();
+            })
             .then(data => setMachines(data))
-            .catch(err => console.error("Could not load machines:", err));
+            .catch(err => {
+                console.error("Could not load machines:", err);
+                setMachinesError(true);
+            })
+            .finally(() => setMachinesLoading(false));
     }, []);
+
+    useEffect(() => {
+        loadMachines();
+    }, [loadMachines]);
 
     const handleBalanceUpdate = (newBalance) => {
         setUser(prev => ({ ...prev, balance: newBalance }));
@@ -125,8 +142,22 @@ function App() {
                 </button>
             </div>
 
-            <div className="grid">
-                {displayed.map(machine => (
+            <div className="grid" aria-busy={machinesLoading}>
+                {machinesLoading ? (
+                    Array.from({ length: 3 }, (_, index) => (
+                        <div className="card machine-skeleton" key={index} aria-hidden="true">
+                            <div className="skeleton-line skeleton-title" />
+                            <div className="skeleton-circle" />
+                            <div className="skeleton-line skeleton-copy" />
+                            <div className="skeleton-button" />
+                        </div>
+                    ))
+                ) : machinesError ? (
+                    <div className="machine-load-message" role="alert">
+                        <p>We couldn’t load the machines. The server may be waking up.</p>
+                        <button className="start-btn" onClick={loadMachines}>Try again</button>
+                    </div>
+                ) : displayed.map(machine => (
                     <WasherCard
                         key={machine.id}
                         washer={machine}
