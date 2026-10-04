@@ -25,7 +25,7 @@ Backend API: [waschsalon.onrender.com](https://waschsalon.onrender.com)
 |-------|-----------|
 | Backend | Java 21 + Spring Boot 3.5 |
 | Frontend | React 18 |
-| Database | Render PostgreSQL (production), H2 (tests) |
+| Database | Neon PostgreSQL (production), H2 (tests) |
 | ORM | Spring Data JPA + Hibernate |
 | Auth | JWT (JJWT 0.12) + BCrypt |
 | Payments | Stripe Java SDK |
@@ -109,11 +109,10 @@ Render's auto-deploy is disabled — all deploys go through the pipeline, so bro
 Create a `.env` file in the project root:
 
 ```
-DATABASE_URL=jdbc:postgresql://localhost:5432/waschmachine
-DATABASE_USERNAME=your_db_user
-DATABASE_PASSWORD=your_db_password
+DATABASE_URL=jdbc:postgresql://<host>/neondb?sslmode=require
+DB_USER=your_db_user
+DB_PASSWORD=your_db_password
 JWT_SECRET=a_secret_key_at_least_32_characters_long
-JWT_EXPIRATION=86400000
 STRIPE_SECRET_KEY=sk_test_...
 ```
 
@@ -209,7 +208,7 @@ The production environment uses two separate services:
 |---------|----------|-------------|
 | Frontend | [Vercel](https://vercel.com) | React app — auto-deploys on push to main |
 | Backend | [Render](https://render.com) | Spring Boot API packaged as a Docker container |
-| Database | [Render](https://render.com) | Managed PostgreSQL instance |
+| Database | [Neon](https://neon.tech) | Serverless PostgreSQL |
 
 **How they connect:**
 - The React app on Vercel calls the Render backend via HTTPS. The backend URL is set as an environment variable in Vercel.
