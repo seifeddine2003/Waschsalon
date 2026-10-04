@@ -2,6 +2,8 @@ package com.start.waschmachine.infrastructure.web;
 
 import com.start.waschmachine.application.washmachine.IWashmachineService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.CacheControl;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @RestController
@@ -19,8 +22,8 @@ public class WashmachineController {
     private IWashmachineService washService;
 
     @GetMapping("/all")
-    public List<Map<String, Object>> getAll() {
-        return washService.getAllMachines().stream()
+    public ResponseEntity<List<Map<String, Object>>> getAll() {
+        List<Map<String, Object>> machines = washService.getAllMachines().stream()
                 .map(w -> {
                     Map<String, Object> map = new HashMap<>();
                     map.put("id", w.getMachineId());
@@ -33,5 +36,9 @@ public class WashmachineController {
                     return map;
                 })
                 .collect(Collectors.toList());
+
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(30, TimeUnit.SECONDS).mustRevalidate())
+                .body(machines);
     }
 }
