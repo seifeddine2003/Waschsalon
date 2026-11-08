@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Icon from "./Icon";
 import API_BASE, { getHeaders } from "../config";
 
 const WASH_TYPES = [
@@ -95,7 +96,7 @@ export default function ReservationModal({ isOpen, onClose, washer, user, onBala
                 return res.json();
             })
             .then((data) => {
-                setMessage("✅ Reservation confirmed!");
+                setMessage("Reservation confirmed!");
                 setIsError(false);
                 setSlots(prev => prev.filter(s => s.startTime !== selectedSlot.startTime));
                 setSelectedSlot(null);
@@ -111,15 +112,15 @@ export default function ReservationModal({ isOpen, onClose, washer, user, onBala
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="reservation-wrapper" onClick={e => e.stopPropagation()}>
+            <div className="reservation-wrapper" role="dialog" aria-modal="true" aria-label={`Reserve ${washer.name}`} onClick={e => e.stopPropagation()}>
 
                 {/* LEFT: Reservation Modal */}
                 <div className="modal reservation-modal">
                     <h2>Reserve {washer.name}</h2>
-                    <div className="today-badge">📅 Today — {formattedDate}</div>
+                    <div className="today-badge"><Icon name="calendar" /> Today — {formattedDate}</div>
 
                     <label className="modal-label">
-                        🕐 Pick a time slot
+                        <Icon name="clock" /> Pick a time slot
                         {loadingSlots && <span className="loading-hint"> — loading...</span>}
                     </label>
 
@@ -138,7 +139,7 @@ export default function ReservationModal({ isOpen, onClose, washer, user, onBala
                         ))}
                     </div>
 
-                    <label className="modal-label">{isDryer ? "💨 Dry type" : "🧺 Wash type"}</label>
+                    <label className="modal-label"><Icon name={isDryer ? "wind" : "washer"} /> {isDryer ? "Dry type" : "Wash type"}</label>
                     <div className="wash-type-grid">
                         {machineTypes.map(type => (
                             <button
@@ -164,20 +165,20 @@ export default function ReservationModal({ isOpen, onClose, washer, user, onBala
 
                 {/* RIGHT: Cart Panel */}
                 <div className={`cart-panel ${showCart ? "visible" : ""}`}>
-                    <h3 className="cart-title">🛒 Your Order</h3>
+                    <h3 className="cart-title"><Icon name="cart" /> Your Order</h3>
 
                     <div className="cart-items">
                         <div className="cart-row">
-                            <span className="cart-label">🖥️ Machine</span>
+                            <span className="cart-label"><Icon name="monitor" /> Machine</span>
                             <span className="cart-value">{washer.name}</span>
                         </div>
                         <div className="cart-row">
-                            <span className="cart-label">📅 Date</span>
+                            <span className="cart-label"><Icon name="calendar" /> Date</span>
                             <span className="cart-value">{formattedDate}</span>
                         </div>
                         {selectedSlot && (
                             <div className="cart-row">
-                                <span className="cart-label">🕐 Time</span>
+                                <span className="cart-label"><Icon name="clock" /> Time</span>
                                 <span className="cart-value">
                                     {selectedSlot.startTime} → {endTime}
                                 </span>
@@ -186,11 +187,11 @@ export default function ReservationModal({ isOpen, onClose, washer, user, onBala
                         {washType && (
                             <>
                                 <div className="cart-row">
-                                    <span className="cart-label">🧺 Type</span>
+                                    <span className="cart-label"><Icon name="washer" /> Type</span>
                                     <span className="cart-value">{washType.label}</span>
                                 </div>
                                 <div className="cart-row">
-                                    <span className="cart-label">⏱️ Duration</span>
+                                    <span className="cart-label"><Icon name="timer" /> Duration</span>
                                     <span className="cart-value">{washType.duration} min</span>
                                 </div>
                             </>
@@ -207,7 +208,7 @@ export default function ReservationModal({ isOpen, onClose, washer, user, onBala
                     </div>
 
                     <div className="cart-balance">
-                        💳 Balance: €{user ? user.balance.toFixed(2) : "0.00"}
+                        <Icon name="wallet" /> Balance: €{user ? user.balance.toFixed(2) : "0.00"}
                     </div>
 
                     <button
@@ -215,7 +216,7 @@ export default function ReservationModal({ isOpen, onClose, washer, user, onBala
                         onClick={handleBook}
                         disabled={booking}
                     >
-                        {booking ? "Processing..." : "✅ Confirm & Pay"}
+                        {booking ? "Processing..." : "Confirm & Pay"}
                     </button>
                 </div>
 

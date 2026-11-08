@@ -4,9 +4,11 @@ import com.start.waschmachine.application.reservation.ReservationRequest;
 import com.start.waschmachine.application.reservation.ReservationService;
 import com.start.waschmachine.application.student.IStudentService;
 import com.start.waschmachine.application.washmachine.IWashmachineService;
+import com.start.waschmachine.domain.reservation.Reservation;
 import com.start.waschmachine.domain.reservation.ReservationRepository;
 import com.start.waschmachine.domain.student.Student;
 import com.start.waschmachine.domain.washmachine.Washmachine;
+import com.start.waschmachine.exception.ReservationConflictException;
 import com.start.waschmachine.exception.StudentNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,7 +18,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -113,6 +118,25 @@ class ReservationServiceTest {
                 () -> reservationService.createReservation(req));
 
         assertEquals("Washmachine not found", ex.getMessage());
+        verify(reservationRepo, never()).save(any());
+    }
+
+    @Test
+    void cancelReservation_alreadyCancelled_throwsException() {
+        Student student = new Student("password", "test@email.com", "Doe", "John");
+        student.setStudentId(1);
+        Washmachine machine = new Washmachine("M1", "Available", null, null, true);
+
+        String futureTime = LocalTime.now().plusHours(1).format(DateTimeFormatter.ofPattern("HH:mm"));
+        Reservation reservation = new Reservation(student, machine, futureTime, "23:59", LocalDate.now());
+        reservation.setStatus("cancelled");
+
+        when(reservationRepo.findById(1)).thenReturn(Optional.of(reservation));
+
+        ReservationConflictException ex = assertThrows(ReservationConflictException.class,
+                () -> reservationService.cancelReservation(1, 1));
+
+        assertEquals("Reservation is already cancelled", ex.getMessage());
         verify(reservationRepo, never()).save(any());
     }
 }

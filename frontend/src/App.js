@@ -7,6 +7,7 @@ import SignupModal from "./components/SignupModal";
 import ReservationModal from "./components/ReservationModal";
 import BalanceModal from "./components/BalanceModal";
 import MyReservationsModal from "./components/MyReservationsModal";
+import Icon from "./components/Icon";
 
 function App() {
     const [machines, setMachines] = useState([]);
@@ -55,8 +56,9 @@ function App() {
 
     return (
         <div className="dashboard-container">
-            <nav className="navbar">
-                <div className="logo">🧺 Laundryweb</div>
+            <a className="skip-link" href="#machines">Skip to machines</a>
+            <nav className="navbar" aria-label="Main">
+                <div className="logo"><Icon name="washer" size={26} /> Laundryweb</div>
                 <div className="nav-links">
                     {user ? (
                         <>
@@ -127,15 +129,17 @@ function App() {
                 </p>
             </header>
 
-            <div className="machine-toggle">
+            <div className="machine-toggle" role="group" aria-label="Machine type" id="machines">
                 <button
                     className={`toggle-btn ${view === "washer" ? "active" : ""}`}
+                    aria-pressed={view === "washer"}
                     onClick={() => setView("washer")}
                 >
                     Washers
                 </button>
                 <button
                     className={`toggle-btn ${view === "dryer" ? "active" : ""}`}
+                    aria-pressed={view === "dryer"}
                     onClick={() => setView("dryer")}
                 >
                     Dryers

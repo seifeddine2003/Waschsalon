@@ -49,12 +49,14 @@ export default function SignupModal({ isOpen, onClose }) {
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal" onClick={e => e.stopPropagation()}>
-                <h2>Sign Up</h2>
+            <div className="modal" role="dialog" aria-modal="true" aria-labelledby="signup-title" onClick={e => e.stopPropagation()}>
+                <h2 id="signup-title">Sign Up</h2>
 
                 <input
                     type="text"
                     placeholder="First Name"
+                    aria-label="First name"
+                    autoComplete="given-name"
                     className="modal-input"
                     value={firstName}
                     onChange={e => setFirstName(e.target.value)}
@@ -62,6 +64,8 @@ export default function SignupModal({ isOpen, onClose }) {
                 <input
                     type="text"
                     placeholder="Last Name"
+                    aria-label="Last name"
+                    autoComplete="family-name"
                     className="modal-input"
                     value={lastName}
                     onChange={e => setLastName(e.target.value)}
@@ -69,6 +73,8 @@ export default function SignupModal({ isOpen, onClose }) {
                 <input
                     type="email"
                     placeholder="Email"
+                    aria-label="Email"
+                    autoComplete="email"
                     className="modal-input"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
@@ -76,6 +82,8 @@ export default function SignupModal({ isOpen, onClose }) {
                 <input
                     type="password"
                     placeholder="Password (min. 8 characters)"
+                    aria-label="Password, minimum 8 characters"
+                    autoComplete="new-password"
                     className="modal-input"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
