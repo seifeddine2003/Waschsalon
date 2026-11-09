@@ -3,7 +3,7 @@
 A full-stack web application that lets students in a dormitory book washing machines and dryers online — no more trips to the laundry room to check availability.
 
 Live demo: [waschsalon.vercel.app](https://waschsalon.vercel.app)  
-Backend API: [waschsalon.onrender.com](https://waschsalon.onrender.com)
+Backend API: [waschsalon-eu.onrender.com](https://waschsalon-eu.onrender.com)
 
 ---
 

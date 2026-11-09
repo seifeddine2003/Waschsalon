@@ -9,4 +9,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping backend
-        run: curl -sf https://waschsalon.onrender.com/washmachines/all > /dev/null
+        run: curl -sf https://waschsalon-eu.onrender.com/washmachines/all > /dev/null
