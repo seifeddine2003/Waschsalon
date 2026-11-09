@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Icon from "./Icon";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { STRIPE_PUBLIC_KEY } from "../config";
@@ -57,9 +58,9 @@ function BalanceForm({ user, onClose, onBalanceUpdate }) {
     };
 
     return (
-        <div className="modal balance-modal" onClick={e => e.stopPropagation()}>
+        <div className="modal balance-modal" role="dialog" aria-modal="true" aria-label="My balance" onClick={e => e.stopPropagation()}>
             <div className="balance-modal-header">
-                <span className="balance-modal-icon">💳</span>
+                <span className="balance-modal-icon"><Icon name="wallet" size={32} /></span>
                 <h2>My Balance</h2>
                 <p className="balance-modal-amount">€{user.balance.toFixed(2)}</p>
                 <p className="balance-modal-sub">Current balance</p>

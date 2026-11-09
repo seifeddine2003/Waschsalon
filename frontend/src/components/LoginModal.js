@@ -21,12 +21,14 @@ export default function LoginModal({ isOpen, onClose, onLogin }) {
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal" onClick={e => e.stopPropagation()}>
-                <h2>Login</h2>
+            <div className="modal" role="dialog" aria-modal="true" aria-labelledby="login-title" onClick={e => e.stopPropagation()}>
+                <h2 id="login-title">Login</h2>
 
                 <input
                     type="email"
                     placeholder="Email"
+                    aria-label="Email"
+                    autoComplete="email"
                     className="modal-input"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
@@ -34,6 +36,8 @@ export default function LoginModal({ isOpen, onClose, onLogin }) {
                 <input
                     type="password"
                     placeholder="Password"
+                    aria-label="Password"
+                    autoComplete="current-password"
                     className="modal-input"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
@@ -41,7 +45,7 @@ export default function LoginModal({ isOpen, onClose, onLogin }) {
 
                 <button className="modal-btn" onClick={handleLogin}>Login</button>
 
-                {error && <p className="modal-message error">{error}</p>}
+                {error && <p className="modal-message error" role="alert">{error}</p>}
 
                 <button className="modal-close" onClick={onClose}>Cancel</button>
             </div>

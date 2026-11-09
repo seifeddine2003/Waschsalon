@@ -45,7 +45,7 @@ export default function MyReservationsModal({ isOpen, user, onClose, onBalanceUp
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal my-reservations-modal" onClick={e => e.stopPropagation()}>
+            <div className="modal my-reservations-modal" role="dialog" aria-modal="true" aria-label="My reservations" onClick={e => e.stopPropagation()}>
                 <h2 className="my-reservations-title">My Reservations</h2>
 
                 {error && <p className="modal-message error">{error}</p>}
@@ -56,6 +56,7 @@ export default function MyReservationsModal({ isOpen, user, onClose, onBalanceUp
                 )}
 
                 {!loading && reservations.length > 0 && (
+                    <div className="reservations-table-wrap">
                     <table className="reservations-table">
                         <thead>
                             <tr>
@@ -94,6 +95,7 @@ export default function MyReservationsModal({ isOpen, user, onClose, onBalanceUp
                             ))}
                         </tbody>
                     </table>
+                    </div>
                 )}
 
                 <button className="modal-close" onClick={onClose}>Close</button>

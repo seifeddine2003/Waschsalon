@@ -1,4 +1,5 @@
 import React from "react";
+import Icon from "./Icon";
 import openWasher from "../images/washer-open.png";
 import closedWasher from "../images/washer-closed.png";
 import defectWasher from "../images/washer-defect.png";
@@ -31,13 +32,13 @@ export default function WasherCard({ washer, user, onReserve }) {
 
             <div className="card-body">
                 {washer.status === "Out of Order" && (
-                    <p className="action-text">⚠️ Washer needs inspection</p>
+                    <p className="action-text"><Icon name="alert" /> {isDryer ? "Dryer" : "Washer"} needs inspection</p>
                 )}
                 {isAvailable && (
-                    <p className="action-text"> Select a time slot to reserve</p>
+                    <p className="action-text"><Icon name="clock" /> Select a time slot to reserve</p>
                 )}
 
-                <img src={getImage()} alt="Washing machine" className="washer-image" />
+                <img src={getImage()} alt={`${isDryer ? "Dryer" : "Washing machine"} ${washer.name}: ${washer.status || "status unknown"}`} className="washer-image" />
             </div>
 
             <div className="card-footer">
