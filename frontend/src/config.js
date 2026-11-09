@@ -7,7 +7,7 @@
 
 // Determine the API base URL depending on whether the app is running in production or development
 const API_BASE = process.env.NODE_ENV === "production"
-    ? "https://waschsalon.onrender.com"
+    ? "https://waschsalon-eu.onrender.com"
     : "http://localhost:8080";
 
 // Stripe Public Key for processing payments in test mode
