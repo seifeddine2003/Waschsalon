@@ -12,3 +12,9 @@ target/
 src/main/resources/application.properties
 
 PROJECT_REPORT.md
+# Editor / tooling files (personal, not part of the app)
+.idea/
+*.iml
+.claude/
+__pycache__/
+*.pyc
